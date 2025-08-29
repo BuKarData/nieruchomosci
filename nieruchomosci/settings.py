@@ -2,14 +2,19 @@ import os
 from pathlib import Path
 import dj_database_url
 
+# 📁 Ścieżki
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 🔑 Bezpieczny Secret Key
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "super-secret-key")
+
+# ⚠️ Debug
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]  # na Railway
+# 🌐 Dozwolone hosty (na Railway najlepiej *)
+ALLOWED_HOSTS = ["*"]
 
-# Aplikacje
+# 🗂 Aplikacje
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -21,9 +26,10 @@ INSTALLED_APPS = [
     "rest_framework",
 ]
 
+# ⚙️ Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # statyczne pliki
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -32,8 +38,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# 🌍 URL conf i WSGI
 ROOT_URLCONF = "nieruchomosci.urls"
+WSGI_APPLICATION = "nieruchomosci.wsgi.application"
 
+# 📦 Szablony
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -50,12 +59,12 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = "nieruchomosci.wsgi.application"
-
+# 🛢 Baza danych
 DATABASES = {
     "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 }
 
+# 🔢 Walidatory haseł
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -63,11 +72,21 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# 🌍 Międzynarodowe ustawienia
 LANGUAGE_CODE = "pl-pl"
 TIME_ZONE = "Europe/Warsaw"
 USE_I18N = True
 USE_TZ = True
 
+# 📦 Pliki statyczne
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# 🖼 Pliki media (jeżeli używasz)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# ⬆️ Domyślne auto-field
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
