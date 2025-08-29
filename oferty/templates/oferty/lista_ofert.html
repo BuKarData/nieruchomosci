@@ -1,24 +1,5 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">BeataDeweloper</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'home' %}">Strona główna</a>
-            <!-- fw-bold = strong -->
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-bold" href="{% url 'lista_ofert' %}"
-              >Oferty</a
-            >
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
   <head>
     <meta charset="UTF-8" />
     <title>Oferty mieszkań i domów</title>
@@ -27,7 +8,7 @@
       rel="stylesheet"
     />
     <style>
-      .status-dostępne {
+      .status-dostepne {
         color: green;
         font-weight: bold;
       }
@@ -41,7 +22,27 @@
       }
     </style>
   </head>
+
   <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">BeataDeweloper</a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home' %}">Strona główna</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="{% url 'lista_ofert' %}"
+                >Oferty</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     <div class="container">
       <h1 class="text-center my-4">Oferty mieszkań i domów</h1>
 
@@ -49,11 +50,11 @@
         <thead class="table-dark">
           <tr>
             <th>Adres</th>
-            <th>Metraż</th>
+            <th>Metraż [m²]</th>
             <th>Pokoje</th>
             <th>Status</th>
-            <th>Aktualna cena</th>
-            <th>Cena za m²</th>
+            <th>Aktualna cena [zł]</th>
+            <th>Cena za m² [zł/m²]</th>
             <th>Historia cen</th>
           </tr>
         </thead>
@@ -61,28 +62,33 @@
           {% for oferta in oferty %}
           <tr>
             <td>{{ oferta.adres }}</td>
-            <td>{{ oferta.metraz_str }}</td>
+            <td>{{ oferta.metraz|floatformat:1 }}</td>
             <td>{{ oferta.pokoje }}</td>
             <td>
-              <span class="{{ oferta.status_class }}"
-                >{{ oferta.status_str }}</span
+              <span class="status-{{ oferta.status|lower }}"
+                >{{ oferta.status|title }}</span
               >
             </td>
-            <td>{{ oferta.ostatnia_cena_str }}</td>
-            <td>{{ oferta.cena_m2_str }}</td>
-
             <td>
-              {% for cena_str in oferta.historia_cen_str %} {{ cena_str }}<br />
+              {% if oferta.ostatnia_cena %} {{
+              oferta.ostatnia_cena.kwota|intcomma }} zł ({{
+              oferta.ostatnia_cena.data }}) {% else %} Brak {% endif %}
+            </td>
+            <td>
+              {% if oferta.ostatnia_cena %} {{
+              oferta.ostatnia_cena.kwota|div:oferta.metraz|intcomma }} zł/m² {%
+              else %} Brak {% endif %}
+            </td>
+            <td>
+              {% for cena in oferta.ceny_list %} {{ cena.kwota|intcomma }} zł
+              ({{ cena.data }})<br />
               {% endfor %}
-
-              <!-- wykres -->
               <canvas
                 id="chart-{{ oferta.id }}"
                 width="300"
                 height="150"
                 data-chart="{{ oferta.chart_data|safe }}"
-              >
-              </canvas>
+              ></canvas>
             </td>
           </tr>
           {% endfor %}
@@ -90,6 +96,7 @@
       </table>
     </div>
 
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       document.querySelectorAll("canvas[data-chart]").forEach((canvas) => {
@@ -101,10 +108,10 @@
               labels: data.labels,
               datasets: [
                 {
-                  label: "Cena [PLN]",
+                  label: "Cena [zł]",
                   data: data.data,
-                  fill: false,
                   borderColor: "rgb(75, 192, 192)",
+                  fill: false,
                   tension: 0.1,
                 },
               ],

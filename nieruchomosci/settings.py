@@ -25,8 +25,13 @@ SECRET_KEY = "django-insecure-p=(zxj%6duq65=yj7_cr-m(ib7w%r3d^b5(ijra*ulnx5!wn&n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://web-production-48d26.up.railway.app"]
 
+import dj_database_url
+
+DATABASES = {
+  'default': dj_database_url.config(default='sqlite:///db.sqlite3')
+}
 
 # Application definition
 
