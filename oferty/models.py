@@ -14,7 +14,7 @@ class Oferta(models.Model):
     pokoje = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostępne")
     data_dodania = models.DateTimeField(auto_now_add=True)  # data utworzenia rekordu
-    zdjecie = models.ImageField(upload_to='oferty/', null=True, blank=True) 
+    zdjecie = models.ImageField(upload_to='inwestycje/', blank=True, null=True)
     def __str__(self):
         return f"{self.adres} ({self.metraz} m², {self.pokoje} pok.)"
 
