@@ -48,36 +48,37 @@
       <p class="text-center text-muted">Budujemy Twój komfort.</p>
 
       {% if ostatnia_oferta %}
-      <div class="card mt-5 shadow-sm">
-        <div class="card-body">
-          <h4 class="card-title">Nasza najświeższa inwestycja</h4>
-          <p><strong>Adres:</strong> {{ ostatnia_oferta.adres }}</p>
-          <p><strong>Metraż:</strong> {{ ostatnia_oferta.metraz_str }} m²</p>
-          <p><strong>Pokoje:</strong> {{ ostatnia_oferta.pokoje }}</p>
-          <p>
-            <strong>Status:</strong>
-            <span class="{{ ostatnia_oferta.status_class }}">{{ ostatnia_oferta.status_str }}</span>
-          </p>
-    
-          {% if ostatnia_oferta.ostatnia_cena_str %}
-            <p><strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena_str }}</p>
-          {% else %}
-            <p><strong>Cena:</strong> Brak</p>
-          {% endif %}
-    
-          <p>
-            <strong>Cena za m²:</strong>
-            {{ ostatnia_oferta.cena_m2_str }}
-          </p>
-    
-          <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
-            Zobacz wszystkie oferty
-          </a>
-        </div>
-      </div>
-    {% else %}
-      <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
-    {% endif %}
+  <div class="card mt-5 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title">Nasza najświeższa inwestycja</h4>
+      <p><strong>Adres:</strong> {{ ostatnia_oferta.adres }}</p>
+      <p><strong>Metraż:</strong> {{ ostatnia_oferta.metraz_str }} m²</p>
+      <p><strong>Pokoje:</strong> {{ ostatnia_oferta.pokoje }}</p>
+      <p>
+        <strong>Status:</strong>
+        <span class="{{ ostatnia_oferta.status_class }}">{{ ostatnia_oferta.status_str }}</span>
+      </p>
+
+      {% if ostatnia_oferta.ostatnia_cena_str %}
+        <p><strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena_str }}</p>
+      {% else %}
+        <p><strong>Cena:</strong> Brak</p>
+      {% endif %}
+
+      <p>
+        <strong>Cena za m²:</strong>
+        {{ ostatnia_oferta.cena_m2_str }}
+      </p>
+
+      <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
+        Zobacz wszystkie oferty
+      </a>
+    </div>
+  </div>
+{% else %}
+  <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
+{% endif %}
+
     
 
           <a href="{% url 'lista_ofert' %}" class="btn btn-outline-primary"
