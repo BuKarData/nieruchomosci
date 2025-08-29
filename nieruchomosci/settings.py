@@ -32,7 +32,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "projekt.urls"
+ROOT_URLCONF = "nieruchomosci.urls"
 
 TEMPLATES = [
     {
@@ -50,7 +50,7 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = "projekt.wsgi.application"
+WSGI_APPLICATION = "nieruchomosci.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
