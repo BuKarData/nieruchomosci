@@ -74,7 +74,7 @@ TEMPLATES = [
 # Baza danych
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('postgresql://postgres:ROODkhQLsllxpCdkzFWAaItwZdMsbPgS@trolley.proxy.rlwy.net:33890/railway')  # tu wstaw Twój URL w Railway env
+        default=os.environ.get('postgresql://postgres:ROODkhQLsllxpCdkzFWAaItwZdMsbPgS@postgres.railway.internal:5432/railway')  # tu wstaw Twój URL w Railway env
     )
 }
 
