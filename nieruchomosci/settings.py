@@ -50,6 +50,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = "nieruchomosci.urls"
 WSGI_APPLICATION = "nieruchomosci.wsgi.application"
 
+# Zdjecia
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Szablony
 TEMPLATES = [
     {
