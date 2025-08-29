@@ -4,3 +4,4 @@ dj-database-url
 whitenoise
 djangorestframework
 psycopg2-binary  
+Pillow>=10.0.0
