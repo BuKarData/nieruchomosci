@@ -73,7 +73,9 @@ TEMPLATES = [
 
 # Baza danych
 DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+    'default': dj_database_url.config(
+        default=os.environ.get('postgresql://postgres:ROODkhQLsllxpCdkzFWAaItwZdMsbPgS@trolley.proxy.rlwy.net:33890/railway')  # tu wstaw Twój URL w Railway env
+    )
 }
 
 # Walidatory haseł
