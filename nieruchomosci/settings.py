@@ -12,7 +12,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "super-secret-key")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # 🌐 Dozwolone hosty (na Railway najlepiej *)
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["bzbud.pl", "www.bzbud.pl", "0s2qosca.up.railway.app"]
+
 
 # 🗂 Aplikacje
 INSTALLED_APPS = [
