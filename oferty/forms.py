@@ -4,7 +4,7 @@ from .models import Oferta, Cena
 class OfertaForm(forms.ModelForm):
     class Meta:
         model = Oferta
-        fields = ['adres', 'metraz', 'pokoje', 'status']  # ✅ zgodne z modelem
+        fields = ['adres', 'metraz', 'pokoje', 'status']  
 
 
 class CenaForm(forms.ModelForm):
