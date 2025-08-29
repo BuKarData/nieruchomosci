@@ -73,9 +73,7 @@ TEMPLATES = [
 
 # Baza danych
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('postgresql://postgres:ROODkhQLsllxpCdkzFWAaItwZdMsbPgS@postgres.railway.internal:5432/railway')  # tu wstaw Twój URL w Railway env
-    )
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 # Walidatory haseł
