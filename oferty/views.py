@@ -15,13 +15,18 @@ def home(request):
     ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
 
     if ostatnia_oferta:
-        ceny = list(ostatnia_oferta.ceny.order_by("data"))
-        if ceny:
-            ostatnia_cena = ceny[-1]
+        # Status CSS i tekst
+        ostatnia_oferta.status_class = f"status-{ostatnia_oferta.status.lower()}"
+        ostatnia_oferta.status_str = ostatnia_oferta.status.title()
+
+        # Metraż jako string
+        ostatnia_oferta.metraz_str = f"{ostatnia_oferta.metraz:.1f}" if ostatnia_oferta.metraz else "Brak"
+
+        # Ostatnia cena i cena za m²
+        ostatnia_cena = ostatnia_oferta.ceny.order_by('-data').first()
+        if ostatnia_cena:
             kwota = float(ostatnia_cena.kwota)
-
             ostatnia_oferta.ostatnia_cena_str = f"{int(kwota):,} zł ({ostatnia_cena.data})"
-
             if ostatnia_oferta.metraz:
                 cena_m2 = int(kwota / float(ostatnia_oferta.metraz))
                 ostatnia_oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
@@ -32,6 +37,7 @@ def home(request):
             ostatnia_oferta.cena_m2_str = "Brak"
 
     return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
+
 
 
 # Lista ofert
