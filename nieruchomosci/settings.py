@@ -74,7 +74,7 @@ TEMPLATES = [
 # Baza danych
 DATABASES = {
     'default': dj_database_url.config(
-        default=env('DATABASE_URL')
+        default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
     )
 }
 
