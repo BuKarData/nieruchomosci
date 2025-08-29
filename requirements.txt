@@ -1,4 +1,23 @@
-Django==4.2.3
-gunicorn==21.2.0
-psycopg2-binary==2.9.6
-dj-database-url==1.0.0
+# Django framework
+Django>=5.2.5,<6
+
+# REST API dla AJAX (opcjonalnie)
+djangorestframework>=3.16.0,<4
+
+# Obsługa stref czasowych i datetime
+pytz>=2023.3
+
+# Parsowanie SQL do migracji
+sqlparse>=0.4.4
+
+# ASGI / serwer wewnętrzny Django
+asgiref>=3.7.2
+
+# Serwowanie statycznych plików w produkcji
+whitenoise>=6.5.0
+
+# Deployment - Gunicorn jako WSGI server
+gunicorn>=20.1.0
+
+# PostgreSQL support (jeśli będziesz zmieniać bazę)
+psycopg2-binary>=2.9.7
