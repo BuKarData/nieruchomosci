@@ -2,7 +2,7 @@
 <html lang="pl">
   <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">BeataDeweloper</a>
+      <a class="navbar-brand" href="{% url 'home' %}">BZBud</a>
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
@@ -12,7 +12,7 @@
             <!-- fw-bold = strong -->
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'lista_ofert' %}">Oferty</a>
+            <a class="nav-link" href="{% url 'lista_ofert' %}">Oferta</a>
           </li>
         </ul>
       </div>
@@ -21,7 +21,7 @@
 
   <head>
     <meta charset="UTF-8" />
-    <title>BeataDeweloper - Warszawa</title>
+    <title>BZBud - Warszawa</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -44,22 +44,41 @@
   </head>
   <body>
     <div class="container mt-5">
-      <h1 class="text-center">BeataDeweloper</h1>
+      <h1 class="text-center">BZBud</h1>
       <p class="text-center text-muted">Budujemy Twój komfort.</p>
 
       {% if ostatnia_oferta %}
       <div class="card mt-5 shadow-sm">
         <div class="card-body">
-          <h4 class="card-title">Zespół mieszkaniowy Zacisze</h4>
+          <h4 class="card-title">Nasza najświeższa inwestycja</h4>
           <p><strong>Adres:</strong> {{ ostatnia_oferta.adres }}</p>
-          <p><strong>Metraż:</strong> {{ ostatnia_oferta.metraz }} m²</p>
-          {% if ostatnia_oferta.ostatnia_cena %}
+          <p><strong>Metraż:</strong> {{ ostatnia_oferta.metraz_str }} m²</p>
+          <p><strong>Pokoje:</strong> {{ ostatnia_oferta.pokoje }}</p>
           <p>
-            <strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena_str }} zł
+            <strong>Status:</strong>
+            <span class="{{ ostatnia_oferta.status_class }}">{{ ostatnia_oferta.status_str }}</span>
           </p>
+    
+          {% if ostatnia_oferta.ostatnia_cena_str %}
+            <p><strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena_str }}</p>
           {% else %}
-          <p><strong>Cena:</strong> Brak</p>
+            <p><strong>Cena:</strong> Brak</p>
           {% endif %}
+    
+          <p>
+            <strong>Cena za m²:</strong>
+            {{ ostatnia_oferta.cena_m2_str }}
+          </p>
+    
+          <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
+            Zobacz wszystkie oferty
+          </a>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
+    {% endif %}
+    
 
           <a href="{% url 'lista_ofert' %}" class="btn btn-outline-primary"
             >Zobacz szczegóły</a
@@ -73,25 +92,6 @@
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg"
         >Zobacz inne oferty</a
       >
-    </div>
-    <!-- blok kontaktowy -->
-    <div
-      style="
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 12px 18px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        font-size: 14px;
-        line-height: 1.4;
-      "
-    >
-      <strong>Kontakt:</strong><br />
-      tel: +48 123 456 789<br />
-      email: biuro@mojafirma.pl
     </div>
 
     <!-- blok kontaktowy -->
@@ -111,7 +111,7 @@
     >
       <strong>Kontakt:</strong><br />
       tel: +48 696 362 748<br />
-      email: budzynkarol18@gmail.com
+      email: beatazochowska8@gmail.com
     </div>
   </body>
 </html>

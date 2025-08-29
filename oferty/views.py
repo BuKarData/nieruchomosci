@@ -7,8 +7,30 @@ from .forms import OfertaForm, CenaForm
 
 
 # Strona główna
+#def home(request):
+ #   ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
+  #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
+
 def home(request):
     ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
+
+    if ostatnia_oferta:
+        ceny = list(ostatnia_oferta.ceny.order_by("data"))
+        if ceny:
+            ostatnia_cena = ceny[-1]
+            kwota = float(ostatnia_cena.kwota)
+
+            ostatnia_oferta.ostatnia_cena_str = f"{int(kwota):,} zł ({ostatnia_cena.data})"
+
+            if ostatnia_oferta.metraz:
+                cena_m2 = int(kwota / float(ostatnia_oferta.metraz))
+                ostatnia_oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
+            else:
+                ostatnia_oferta.cena_m2_str = "Brak"
+        else:
+            ostatnia_oferta.ostatnia_cena_str = "Brak"
+            ostatnia_oferta.cena_m2_str = "Brak"
+
     return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
 
