@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
-  {% load humanize %}
+  {% load static %} {% load humanize %}
   <head>
     <meta charset="UTF-8" />
     <title>Oferty mieszkań i domów</title>
@@ -9,7 +9,7 @@
       rel="stylesheet"
     />
     <style>
-      .status-dostepne {
+      .status-dostępne {
         color: green;
         font-weight: bold;
       }
@@ -23,9 +23,7 @@
       }
     </style>
   </head>
-
   <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'home' %}">BeataDeweloper</a>
@@ -63,27 +61,37 @@
           {% for oferta in oferty %}
           <tr>
             <td>{{ oferta.adres }}</td>
-            <td>{{ oferta.metraz|floatformat:1 }}</td>
-            <td>{{ oferta.pokoje }}</td>
+            <td>{{ oferta.metraz|default:"Brak"|floatformat:1 }}</td>
+            <td>{{ oferta.pokoje|default:"Brak" }}</td>
             <td>
               <span class="status-{{ oferta.status|lower }}"
                 >{{ oferta.status|title }}</span
               >
             </td>
             <td>
-              {% if oferta.ostatnia_cena %} {{
-              oferta.ostatnia_cena.kwota|intcomma }} zł ({{
-              oferta.ostatnia_cena.data }}) {% else %} Brak {% endif %}
+              {% if oferta.ostatnia_cena %}
+                {{ oferta.ostatnia_cena.kwota|intcomma }} zł ({{ oferta.ostatnia_cena.data }})
+              {% else %}
+                Brak
+              {% endif %}
             </td>
             <td>
-              {% if oferta.ostatnia_cena %} {{
-              oferta.ostatnia_cena.kwota|div:oferta.metraz|intcomma }} zł/m² {%
-              else %} Brak {% endif %}
+              {% if oferta.cena_m2 %}
+                {{ oferta.cena_m2|intcomma }} zł/m²
+              {% else %}
+                Brak
+              {% endif %}
             </td>
             <td>
-              {% for cena in oferta.ceny_list %} {{ cena.kwota|intcomma }} zł
-              ({{ cena.data }})<br />
-              {% endfor %}
+              {% if oferta.ceny_list %}
+                {% for cena in oferta.ceny_list %}
+                  {{ cena.kwota|intcomma }} zł ({{ cena.data }})<br/>
+                {% endfor %}
+              {% else %}
+                Brak historii
+              {% endif %}
+            </td>
+            
               <canvas
                 id="chart-{{ oferta.id }}"
                 width="300"
@@ -97,7 +105,6 @@
       </table>
     </div>
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       document.querySelectorAll("canvas[data-chart]").forEach((canvas) => {
@@ -123,11 +130,7 @@
             },
           });
         } catch (e) {
-          console.error(
-            "Błąd parsowania danych dla wykresu:",
-            e,
-            canvas.dataset.chart
-          );
+          console.error("Błąd parsowania danych dla wykresu:", e);
         }
       });
     </script>

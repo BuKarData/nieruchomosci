@@ -1,20 +1,56 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.db.models import Prefetch
 from .models import Oferta, Cena
 from .forms import OfertaForm, CenaForm
 
+
 # Strona główna
 def home(request):
-    # Pobranie ostatnio dodanej inwestycji
     ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
     return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
+
 # Lista ofert
+from django.shortcuts import render
+from django.db.models import Prefetch
+from .models import Oferta, Cena
+
 def lista_ofert(request):
-    oferty = Oferta.objects.all().order_by('-data_dodania')
+    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
+
+    for oferta in oferty:
+        ceny = list(oferta.ceny.all())
+        oferta.ceny_list = []  # lista dla historii cen
+
+        for c in ceny:
+            try:
+                kwota = float(c.kwota)
+                oferta.ceny_list.append({'kwota': kwota, 'data': c.data})
+            except (ValueError, TypeError):
+                continue
+
+        if oferta.ceny_list:
+            ostatnia = oferta.ceny_list[-1]
+            oferta.ostatnia_cena = ostatnia
+            oferta.cena_m2 = int(ostatnia['kwota'] / float(oferta.metraz)) if oferta.metraz else None
+        else:
+            oferta.ostatnia_cena = None
+            oferta.cena_m2 = None
+
+        oferta.chart_data = {
+            "labels": [str(c['data']) for c in oferta.ceny_list],
+            "data": [c['kwota'] for c in oferta.ceny_list],
+        }
+
     return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
-# Dodawanie oferty – formularz Django
+
+
+
+# Dodawanie oferty
 def dodaj_oferte(request):
     if request.method == "POST":
         form = OfertaForm(request.POST)
@@ -25,7 +61,8 @@ def dodaj_oferte(request):
         form = OfertaForm()
     return render(request, "oferty/dodaj_oferte.html", {"form": form})
 
-# Dodawanie ceny dla oferty – poprawa CSRF
+
+# Dodawanie ceny
 def dodaj_cene(request, oferta_id):
     oferta = get_object_or_404(Oferta, id=oferta_id)
     if request.method == "POST":
@@ -39,14 +76,29 @@ def dodaj_cene(request, oferta_id):
         form = CenaForm()
     return render(request, "oferty/dodaj_cene.html", {"form": form, "oferta": oferta})
 
-# Jeśli testujemy AJAX POST – trzeba dodać CSRF token
-from django.http import JsonResponse
 
+# AJAX dodawanie ceny
+@csrf_exempt
 def ajax_dodaj_cene(request, oferta_id):
-    if request.method == "POST" and request.headers.get('X-CSRFToken'):
+    if request.method == "POST":
         oferta = get_object_or_404(Oferta, id=oferta_id)
-        kwota = request.POST.get("kwota")
+        kwota = safe_float(request.POST.get("kwota"))
         data = request.POST.get("data")
-        Cena.objects.create(oferta=oferta, kwota=kwota, data=data)
-        return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "fail"}, status=403)
+        if kwota is not None and data:
+            Cena.objects.create(oferta=oferta, kwota=kwota, data=data)
+            return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "fail"}, status=400)
+
+
+# --- Pomocnicza funkcja do bezpiecznej konwersji kwoty ---
+def safe_float(value):
+    """
+    Konwertuje wartość na float, usuwa spacje i przecinki.
+    Zwraca None jeśli konwersja się nie powiedzie.
+    """
+    if value is None:
+        return None
+    try:
+        return float(str(value).replace(" ", "").replace(",", ""))
+    except (ValueError, TypeError):
+        return None
