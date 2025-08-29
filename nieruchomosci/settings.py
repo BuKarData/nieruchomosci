@@ -31,9 +31,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']  #['.railway.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['.railway.app', '127.0.0.1', 'localhost']
 
 
 import dj_database_url
