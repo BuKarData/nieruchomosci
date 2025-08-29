@@ -15,11 +15,14 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# URL do plików statycznych
-STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
 
-# Miejsce na produkcyjne pliki statyczne
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# Whitenoise
+MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ... reszta middleware
+]
 
 
 
