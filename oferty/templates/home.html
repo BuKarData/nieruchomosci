@@ -40,6 +40,19 @@
         flex-direction: column;
         text-align: center;
       }
+
+      .status-dostępne {
+    color: green;
+    font-weight: bold;
+  }
+  .status-rezerwacja {
+    color: orange;
+    font-weight: bold;
+  }
+  .status-sprzedane {
+    color: red;
+    font-weight: bold;
+  }
     </style>
   </head>
   <body>
@@ -58,6 +71,7 @@
         <strong>Status:</strong>
         <span class="{{ ostatnia_oferta.status_class }}">{{ ostatnia_oferta.status_str }}</span>
       </p>
+      
 
       {% if ostatnia_oferta.ostatnia_cena_str %}
         <p><strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena_str }}</p>
