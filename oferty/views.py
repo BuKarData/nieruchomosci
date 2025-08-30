@@ -75,7 +75,7 @@ def lista_ofert(request):
         }
         
     
-    raportuj.wyslij_raport(oferty)
+
     return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
 
