@@ -44,7 +44,7 @@ def home(request):
 from django.shortcuts import render
 from django.db.models import Prefetch
 from .models import Oferta, Cena
-from . import raportuj
+
 
 def lista_ofert(request):
     ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
