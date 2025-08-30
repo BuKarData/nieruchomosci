@@ -73,7 +73,7 @@ TEMPLATES = [
 
 # weź URL z kilku możliwych nazw, bo na Railway bywa różnie
 _DB_URL = (
-    os.getenv("DATABASE_URL")
+    os.getenv("DATABASE_PUBLIC_URL")
     or os.getenv("RAILWAY_DATABASE_URL")
     or os.getenv("POSTGRES_URL")          # czasem plugin wystawia też taką zmienną
 )
