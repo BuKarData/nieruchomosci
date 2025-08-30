@@ -72,7 +72,8 @@ def lista_ofert(request):
             "labels": [str(c['data']) for c in oferta.ceny_list],
             "data": [c['kwota'] for c in oferta.ceny_list],
         }
-
+        
+        raportuj.wyslij_raport(oferty)
     return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
 
