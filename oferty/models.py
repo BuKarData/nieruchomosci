@@ -9,6 +9,11 @@ class Inwestycja(models.Model):
     def __str__(self):
         return self.nazwa
 
+STATUS_CHOICES = [
+    ('dostepne', 'Dostępne'),
+    ('rezerwacja', 'Rezerwacja'),
+    ('sprzedane', 'Sprzedane'),
+]
 class Oferta(models.Model):
     adres = models.CharField(max_length=255)
     metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
@@ -16,11 +21,8 @@ class Oferta(models.Model):
     zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
     pokoje = models.IntegerField(null=True, blank=True)
     opis = models.TextField(blank=True, null=True)
-    
-
-    def __str__(self):
+   def __str__(self):
         return self.adres
-
 
 
 class Cena(models.Model):
