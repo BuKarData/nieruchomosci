@@ -82,9 +82,11 @@ if not _DB_URL:
     # WOLNO użyć SQLite TYLKO lokalnie. Na produkcji to skasuj!
     _DB_URL = "sqlite:///db.sqlite3"
 
+
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
+
 
 
 # Walidatory haseł
