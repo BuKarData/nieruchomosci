@@ -1,15 +1,15 @@
-from django import forms
+from django.contrib import admin
 from .models import Inwestycja, Oferta
 
-# -------- Formularz dla inwestycji --------
-class InwestycjaForm(forms.ModelForm):
-    class Meta:
-        model = Inwestycja
-        fields = ["nazwa", "opis", "zdjecie"]
+
+@admin.register(Inwestycja)
+class InwestycjaAdmin(admin.ModelAdmin):
+    list_display = ("nazwa", "opis", "zdjecie")
+    search_fields = ("nazwa",)
 
 
-# -------- Formularz dla oferty/lokalu --------
-class OfertaForm(forms.ModelForm):
-    class Meta:
-        model = Oferta
-        fields = ["inwestycja", "adres", "metraz", "cena", "status", "pokoje"]
+@admin.register(Oferta)
+class OfertaAdmin(admin.ModelAdmin):
+    list_display = ("adres", "metraz", "cena", "status", "pokoje", "inwestycja")
+    list_filter = ("status", "inwestycja")
+    search_fields = ("adres",)
