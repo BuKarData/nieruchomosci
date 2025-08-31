@@ -131,32 +131,39 @@
 
       {% for oferta in oferty %}
       <div class="card mb-4 shadow-sm oferta-card">
-        <div class="oferta-body">
-          <h4>{{ oferta.adres }}</h4>
-          <p>Metraż: {{ oferta.metraz_str }} m²</p>
-          <p>
-            Status:
-            <span class="{{ oferta.status_class }}"
-              >{{ oferta.status_str }}</span
+        <div class="row g-0 align-items-center">
+          <!-- Tekst po lewej -->
+          <div class="col-md-8 p-3 oferta-body">
+            <h4>{{ oferta.adres }}</h4>
+            <p>Metraż: {{ oferta.metraz_str }} m²</p>
+            <p>
+              Status:
+              <span class="{{ oferta.status_class }}"
+                >{{ oferta.status_str }}</span
+              >
+            </p>
+            <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
+            <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
+            <button
+              type="button"
+              class="btn btn-primary mt-2 btn-hover-fill"
+              data-bs-toggle="modal"
+              data-bs-target="#modal{{ oferta.id }}"
             >
-          </p>
-          <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
-          <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
-          <button
-            type="button"
-            class="btn btn-primary mt-2 btn-hover-fill"
-            data-bs-toggle="modal"
-            data-bs-target="#modal{{ oferta.id }}"
+              Zobacz szczegóły
+            </button>
+          </div>
+
+          <!-- Zdjęcie po prawej -->
+          <div
+            class="col-md-4 d-flex justify-content-center align-items-center p-3 oferta-image"
           >
-            Zobacz szczegóły
-          </button>
-        </div>
-        <div class="oferta-image">
-          {% if oferta.zdjecie %}
-          <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" />
-          {% else %}
-          <img src="{% static 'placeholder.png' %}" alt="Brak zdjęcia" />
-          {% endif %}
+            {% if oferta.zdjecie %}
+            <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" />
+            {% else %}
+            <img src="{% static 'placeholder.png' %}" alt="Brak zdjęcia" />
+            {% endif %}
+          </div>
         </div>
       </div>
 
