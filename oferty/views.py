@@ -15,52 +15,8 @@ from decimal import Decimal
 from django.db.models import Prefetch
 
 def home(request):
-    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
-    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
-
-    for oferta in oferty:
-        ceny = list(oferta.ceny.all())
-        oferta.ostatnia_cena = ceny[-1] if ceny else None
-
-        # Cena
-        if oferta.ostatnia_cena and oferta.ostatnia_cena.kwota is not None:
-            kwota = oferta.ostatnia_cena.kwota
-            try:
-                kwota_int = int(Decimal(kwota))
-            except:
-                kwota_int = None
-            oferta.ostatnia_cena_str = f"{kwota_int:,}".replace(",", " ") + " zł" if kwota_int else "Brak"
-        else:
-            oferta.ostatnia_cena_str = "Brak"
-
-        # Cena za m²
-        if oferta.ostatnia_cena and oferta.metraz:
-            try:
-                kwota = oferta.ostatnia_cena.kwota
-                cena_m2 = int(Decimal(kwota) / Decimal(oferta.metraz))
-                oferta.cena_m2_str = f"{cena_m2:,}".replace(",", " ") + " zł/m²"
-            except:
-                oferta.cena_m2_str = "Brak"
-        else:
-            oferta.cena_m2_str = "Brak"
-
-        oferta.metraz_str = f"{float(oferta.metraz):.2f}" if oferta.metraz else "Brak"
-
-        # Status
-        raw_status = (str(oferta.status) or "").lower()
-        oferta.status_str = oferta.get_status_display() if hasattr(oferta, "get_status_display") else raw_status.capitalize()
-        if "sprzed" in raw_status:
-            oferta.status_class = "badge bg-danger"
-        elif "rezerw" in raw_status:
-            oferta.status_class = "badge bg-warning text-dark"
-        else:
-            oferta.status_class = "badge bg-success"
-
-    # Najnowsza oferta do podglądu na stronie głównej
-    ostatnia_oferta = oferty.first() if oferty else None
-
-    return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta, "oferty": oferty})
-
+    inwestycje = Inwestycja.objects.prefetch_related('oferty').all()
+    return render(request, 'home.html', {'inwestycje': inwestycje})
 
 
 

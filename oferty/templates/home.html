@@ -1,178 +1,72 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pl">
-  {% load static %}
-  <head>
-    <meta charset="UTF-8" />
-    <title>BZBUD Deweloper</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
+<head>
+    <meta charset="UTF-8">
+    <title>BZBUD Inwestycje</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-      body,
-      html {
-        margin: 0;
-        height: 100%;
-      }
-      .oferta-image img {
-        width: 100%;
-        max-height: 250px;
-        object-fit: cover;
-        border-radius: 5px;
-      }
-      .btn-hover:hover {
-        background-color: #0056b3;
-        color: white;
-        transition: 0.3s;
-      }
-      .status-dostępne {
-        color: green;
-        font-weight: bold;
-      }
-      .status-rezerwacja {
-        color: orange;
-        font-weight: bold;
-      }
-      .status-sprzedane {
-        color: red;
-        font-weight: bold;
-      }
-      /* Estetyczne odstępy */
-      .card .row {
-        align-items: center;
-      }
+        .inwestycja-card img { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; }
+        .btn-hover:hover { background-color: #0056b3; color: white; transition: 0.3s; }
     </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">BZBUD</a>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link fw-bold" href="{% url 'home' %}"
-                >Strona główna</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'lista_ofert' %}">Oferta</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Nasze Inwestycje</h1>
 
-    <div class="container mt-5">
-      <h1 class="text-center">BZBUD</h1>
-      <p class="text-center text-muted">Budujemy Twój komfort.</p>
-
-      <!-- Podgląd ostatniej inwestycji -->
-      {% if ostatnia_oferta %}
-      <div class="card mb-4 shadow-sm">
-        <div class="row g-0">
-          <div class="col-md-8 p-3">
-            <h4>{{ ostatnia_oferta.adres }}</h4>
-            <p>Metraż: {{ ostatnia_oferta.metraz_str }} m²</p>
-            <p>
-              Status:
-              <span class="{{ ostatnia_oferta.status_class }}"
-                >{{ ostatnia_oferta.status_str }}</span
-              >
-            </p>
-            <p>Cena: {{ ostatnia_oferta.ostatnia_cena_str }}</p>
-            <p>Cena za m²: {{ ostatnia_oferta.cena_m2_str }}</p>
-            <button
-              type="button"
-              class="btn btn-primary btn-hover mt-2"
-              data-bs-toggle="modal"
-              data-bs-target="#modalOferty"
-            >
-              Zobacz szczegóły
-            </button>
-          </div>
-          <div
-            class="col-md-4 p-3 d-flex justify-content-center align-items-center"
-          >
-            {% if ostatnia_oferta.zdjecie %}
-            <img
-              src="{{ ostatnia_oferta.zdjecie.url }}"
-              alt="Zdjęcie inwestycji"
-            />
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      <!-- Modal z wszystkimi ofertami -->
-      <div
-        class="modal fade"
-        id="modalOferty"
-        tabindex="-1"
-        aria-labelledby="modalOfertyLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalOfertyLabel">Szczegóły ofert</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Zamknij"
-              ></button>
-            </div>
-            <div class="modal-body">
-              {% for oferta in oferty %}
-              <div class="card mb-3 shadow-sm">
-                <div class="row g-0">
-                  <div class="col-md-8 p-3">
-                    <h5>{{ oferta.adres }}</h5>
-                    <p>{{ oferta.opis|default:"Brak opisu" }}</p>
-                    <p>Metraż: {{ oferta.metraz_str }} m²</p>
-                    <p>
-                      Status:
-                      <span class="{{ oferta.status_class }}"
-                        >{{ oferta.status_str }}</span
-                      >
-                    </p>
-                    <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
-                    <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
-                  </div>
-                  <div
-                    class="col-md-4 p-3 d-flex justify-content-center align-items-center"
-                  >
-                    {% if oferta.zdjecie %}
-                    <img
-                      src="{{ oferta.zdjecie.url }}"
-                      alt="Zdjęcie inwestycji"
-                      style="
-                        width: 100%;
-                        max-height: 200px;
-                        object-fit: cover;
-                        border-radius: 5px;
-                      "
-                    />
-                    {% endif %}
-                  </div>
+    <div class="row">
+        {% for inwestycja in inwestycje %}
+        <div class="col-md-6 mb-4">
+            <div class="card inwestycja-card shadow-sm">
+                {% if inwestycja.zdjecie %}
+                <img src="{{ inwestycja.zdjecie.url }}" alt="Zdjęcie inwestycji">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ inwestycja.nazwa }}</h5>
+                    <p class="card-text">{{ inwestycja.opis|default:"Brak opisu" }}</p>
+                    <button type="button" class="btn btn-primary btn-hover" data-bs-toggle="modal" data-bs-target="#modal{{ inwestycja.id }}">
+                        Zobacz szczegóły
+                    </button>
                 </div>
-              </div>
-              {% endfor %}
             </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Zamknij
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
+
+        <!-- Modal z lokalami inwestycji -->
+        <div class="modal fade" id="modal{{ inwestycja.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ inwestycja.nazwa }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for oferta in inwestycja.oferty.all %}
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-8 p-3">
+                                    <h6>{{ oferta.adres }}</h6>
+                                    <p>Metraż: {{ oferta.metraz|default:"Brak" }} m²</p>
+                                    <p>Status: {{ oferta.status }}</p>
+                                    <p>Cena: {{ oferta.kwota|default:"Brak" }} zł</p>
+                                    <p>{{ oferta.opis|default:"Brak opisu" }}</p>
+                                </div>
+                                <div class="col-md-4 p-3">
+                                    {% if oferta.zdjecie %}
+                                    <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie lokalu" style="width:100%; object-fit:cover; max-height:200px; border-radius:5px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>Brak lokali w tej inwestycji.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
       <!-- Przycisk Zobacz inne oferty -->
       <div class="text-center mt-4">
