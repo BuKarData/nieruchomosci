@@ -10,13 +10,13 @@ class Inwestycja(models.Model):
         return self.nazwa
 
 class Oferta(models.Model):
-    inwestycja = models.ForeignKey(Inwestycja, related_name='oferty', on_delete=models.CASCADE)
     adres = models.CharField(max_length=255)
-    metraz = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=[('dostępne','Dostępne'), ('rezerwacja','Rezerwacja'), ('sprzedane','Sprzedane')])
-    kwota = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    zdjecie = models.ImageField(upload_to='oferty/', blank=True, null=True)
+    metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
+    pokoje = models.IntegerField(null=True, blank=True)
     opis = models.TextField(blank=True, null=True)
+    
 
     def __str__(self):
         return self.adres

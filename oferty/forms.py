@@ -4,10 +4,10 @@ from .models import Oferta, Cena
 class OfertaForm(forms.ModelForm):
     class Meta:
         model = Oferta
-        fields = ['adres', 'metraz', 'pokoje', 'status']  
-
+        # Upewnij się, że wymieniasz tylko istniejące pola:
+        fields = ['adres', 'metraz', 'status', 'zdjecie', 'opis', 'pokoje']  
 
 class CenaForm(forms.ModelForm):
     class Meta:
         model = Cena
-        fields = ['oferta', 'kwota', 'data']
+        fields = ['kwota', 'data']
