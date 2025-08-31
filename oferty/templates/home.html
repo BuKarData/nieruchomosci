@@ -43,105 +43,95 @@
       }
 
       .status-dostępne {
-    color: green;
-    font-weight: bold;
-  }
-  .status-rezerwacja {
-    color: orange;
-    font-weight: bold;
-  }
-  .status-sprzedane {
-    color: red;
-    font-weight: bold;
-  }
+        color: green;
+        font-weight: bold;
+      }
+      .status-rezerwacja {
+        color: orange;
+        font-weight: bold;
+      }
+      .status-sprzedane {
+        color: red;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <div class="container mt-5">
       <h1 class="text-center">BZBUD</h1>
-      <p class="text-center text-muted">STRONA W BUDOWIE - OFERTY TESTOWE - Budujemy Twój komfort. </p>
+      <p class="text-center text-muted">
+        STRONA W BUDOWIE - OFERTY TESTOWE - Budujemy Twój komfort.
+      </p>
 
-      <div class="container mt-5">
-        <h1 class="text-center">BZBud</h1>
-        <p class="text-center text-muted">Budujemy Twój komfort.</p>
-      
-        {% if oferty %}
-          <div class="row">
-            {% for oferta in oferty %}
-              <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100">
-                  <div class="row g-0">
-                    <div class="col-md-6">
-                      <div class="card-body">
-                        <h4 class="card-title">Nasza inwestycja</h4>
-                        <p><strong>Adres:</strong> {{ oferta.adres }}</p>
-                        <p><strong>Metraż:</strong> {{ oferta.metraz_str }} m²</p>
-                        <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
-                        <p>
-                          <strong>Status:</strong>
-                          <span class="{{ oferta.status_class }}">
-                            {{ oferta.status_str }}
-                          </span>
-                        </p>
-                        {% if oferta.ostatnia_cena_str %}
-                          <p><strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}</p>
-                        {% else %}
-                          <p><strong>Cena:</strong> Brak</p>
-                        {% endif %}
-                        <p>
-                          <strong>Cena za m²:</strong>
-                          {{ oferta.cena_m2_str }}
-                        </p>
-                        <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
-                          Zobacz szczegóły
-                        </a>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      {% if oferta.zdjecie %}
-                        <img src="{{ oferta.zdjecie.url }}"
-                             class="img-fluid rounded-end"
-                             alt="Zdjęcie inwestycji"
-                             style="object-fit: cover; height: 100%; width: 100%;" />
-                      {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
-                          <span class="text-muted">Brak zdjęcia</span>
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
+      {% if oferty %} {% for oferta in oferty %}
+      <div class="card mt-5 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title">Inwestycja</h4>
+          <p><strong>Adres:</strong> {{ oferta.adres }}</p>
+          <p><strong>Metraż:</strong> {{ oferta.metraz }} m²</p>
+          <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
+          <p>
+            <strong>Status:</strong>
+            <span class="{{ oferta.status_class }}">
+              {{ oferta.status_str }}
+            </span>
+          </p>
+          {% if oferta.ostatnia_cena %}
+          <p><strong>Cena:</strong> {{ oferta.ostatnia_cena.kwota }}</p>
+          <p><strong>Cena za m²:</strong> {{ oferta.cena_m2 }}</p>
+          {% else %}
+          <p><strong>Cena:</strong> Brak</p>
+          {% endif %} {% if oferta.zdjecie %}
+          <div class="text-center mt-3">
+            <img
+              src="{{ oferta.zdjecie.url }}"
+              alt="Zdjęcie inwestycji"
+              class="img-fluid rounded"
+              style="max-height: 300px; object-fit: cover"
+            />
           </div>
-        {% else %}
-          <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
-        {% endif %}
+          {% else %}
+          <div class="text-center mt-3">
+            <img
+              src="{% static 'img/brak_zdjecia.jpg' %}"
+              alt="Brak zdjęcia"
+              class="img-fluid rounded"
+              style="max-height: 300px; object-fit: cover"
+            />
+          </div>
+          {% endif %}
+
+          <div class="text-center mt-3">
+            <a href="{% url 'lista_ofert' %}" class="btn btn-primary">
+              Zobacz szczegóły
+            </a>
+          </div>
+        </div>
       </div>
-      
-      
-      <style>
+      {% endfor %} {% else %}
+      <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
+      {% endif %}
+    </div>
+
+    <style>
       .inwestycja-img {
-          flex: 0 0 400px;         /* szerokość ramki */
-          max-height: 300px;       /* maksymalna wysokość */
-          overflow: hidden;
-          border-radius: 5px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f0f0f0;
-          margin-left: 20px;
+        flex: 0 0 400px; /* szerokość ramki */
+        max-height: 300px; /* maksymalna wysokość */
+        overflow: hidden;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+        margin-left: 20px;
       }
-      
+
       .inwestycja-img img {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
       }
-      </style>
-
-      
-
+    </style>
 
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg"
@@ -150,26 +140,29 @@
     </div>
 
     <!-- Sekcja "O nas" -->
-<section class="container my-5 py-5 bg-light rounded shadow-sm">
-  <div class="row align-items-center">
-    <!-- Tekst -->
-    <div class="col-md-6 mb-4 mb-md-0">
-      <h2 class="mb-3">O nas</h2>
-      <p class="lead">
-        Rodzinna firma z Zielonki. Od lat budujemy komfortowe i nowoczesne mieszkania oraz domy, 
-        stawiając na jakość i zadowolenie naszych klientów.
-      </p>
-    </div>
+    <section class="container my-5 py-5 bg-light rounded shadow-sm">
+      <div class="row align-items-center">
+        <!-- Tekst -->
+        <div class="col-md-6 mb-4 mb-md-0">
+          <h2 class="mb-3">O nas</h2>
+          <p class="lead">
+            Rodzinna firma z Zielonki. Od lat budujemy komfortowe i nowoczesne
+            mieszkania oraz domy, stawiając na jakość i zadowolenie naszych
+            klientów.
+          </p>
+        </div>
 
-    <!-- Obrazek -->
-    <div class="col-md-6 text-center">
-      <img src="{% static 'BZBUD.png' %}" 
-           alt="O nas" 
-           class="img-fluid rounded shadow-sm" 
-           style="max-height: 300px; object-fit: cover;">
-    </div>
-  </div>
-</section>
+        <!-- Obrazek -->
+        <div class="col-md-6 text-center">
+          <img
+            src="{% static 'BZBUD.png' %}"
+            alt="O nas"
+            class="img-fluid rounded shadow-sm"
+            style="max-height: 300px; object-fit: cover"
+          />
+        </div>
+      </div>
+    </section>
 
     <!-- blok kontaktowy -->
     <div
