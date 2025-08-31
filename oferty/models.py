@@ -2,9 +2,9 @@ from django.db import models
 from decimal import Decimal
 
 class Inwestycja(models.Model):
-    nazwa = models.CharField(max_length=255)
+    nazwa = models.CharField(max_length=200)
     opis = models.TextField(blank=True, null=True)
-    zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
+    zdjecie = models.ImageField(upload_to='inwestycje/', blank=True, null=True)
 
     def __str__(self):
         return self.nazwa
