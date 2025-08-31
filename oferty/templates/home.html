@@ -140,11 +140,7 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
                 </div>
                 <div class="modal-body">
-                  <p><strong>Metraż:</strong> {{ oferta.metraz_str }} m²</p>
-                  <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
-                  <p><strong>Status:</strong> <span class="{{ oferta.status_class }}">{{ oferta.status_str }}</span></p>
-                  <p><strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}</p>
-                  <p><strong>Cena za m²:</strong> {{ oferta.cena_m2_str }}</p>
+                 
         
                   {% if oferta.zdjecie %}
                     <img src="{{ oferta.zdjecie.url }}" class="img-fluid mb-3" alt="Zdjęcie inwestycji">
@@ -158,6 +154,13 @@
                         <li><a href="{{ plik.file.url }}" download>{{ plik.name }}</a></li>
                       {% endfor %}
                     </ul>
+
+                    <p><strong>Metraż:</strong> {{ oferta.metraz_str }} m²</p>
+                    <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
+                    <p><strong>Status:</strong> <span class="{{ oferta.status_class }}">{{ oferta.status_str }}</span></p>
+                    <p><strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}</p>
+                    <p><strong>Cena za m²:</strong> {{ oferta.cena_m2_str }}</p>
+                    
                   {% endif %}
                 </div>
                 <div class="modal-footer">
