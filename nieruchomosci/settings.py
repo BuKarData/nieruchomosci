@@ -71,13 +71,21 @@ TEMPLATES = [
     }
 ]
 
-# Baza danych
+# weź URL z kilku możliwych nazw, bo na Railway bywa różnie
+_DB_URL = (
+    os.getenv("DATABASE_PUBLIC_URL")
+    or os.getenv("RAILWAY_DATABASE_URL")
+    or os.getenv("POSTGRES_URL")          # czasem plugin wystawia też taką zmienną
+)
+
+if not _DB_URL:
+    # WOLNO użyć SQLite TYLKO lokalnie. Na produkcji to skasuj!
+    _DB_URL = "sqlite:///db.sqlite3"
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_PUBLIC_URL'),
-        conn_max_age=600,
-    )
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
+
 
 # Walidatory haseł
 AUTH_PASSWORD_VALIDATORS = [
