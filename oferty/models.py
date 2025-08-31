@@ -21,7 +21,7 @@ class Oferta(models.Model):
     metraz = models.DecimalField(max_digits=8, decimal_places=2)
     cena = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=50)
-
+    pokoje = models.IntegerField(default=1) 
     def __str__(self):
         return f"{self.inwestycja.nazwa} - {self.adres}"
 
