@@ -67,13 +67,9 @@
         <div class="row g-0">
           <div class="col-md-6">
             {% if oferta.zdjecie %}
-            <img
-              src="{{ oferta.zdjecie.url }}"
-              alt="Zdjęcie inwestycji"
-              class="oferta-img"
-            />
-            {% endif %}
-          </div>
+            <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" class="oferta-img"/>
+          {% endif %}
+          
           <div class="col-md-6">
             <div class="card-body">
               <h4 class="card-title">{{ oferta.nazwa }}</h4>
