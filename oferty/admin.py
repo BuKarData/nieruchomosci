@@ -1,16 +1,15 @@
 from django.contrib import admin
-from .models import Oferta, Inwestycja
+from .models import Inwestycja, Oferta
 
-# Rejestracja modelu Inwestycja
 @admin.register(Inwestycja)
 class InwestycjaAdmin(admin.ModelAdmin):
-    list_display = ('nazwa', 'opis', 'zdjecie', 'data_dodania')  # tylko istniejące pola
-    search_fields = ('nazwa', 'opis')
-    list_filter = ('data_dodania',)  # tylko pola typu DateField/DateTimeField
+    list_display = ("nazwa", "adres", "data_dodania")
+    search_fields = ("nazwa", "adres")
+    list_filter = ("data_dodania",)
 
-# Rejestracja modelu Oferta
+
 @admin.register(Oferta)
 class OfertaAdmin(admin.ModelAdmin):
-    list_display = ('adres', 'metraz', 'pokoje', 'status', 'inwestycja')
-    search_fields = ('adres',)
-    list_filter = ('status', 'inwestycja')
+    list_display = ("adres", "inwestycja", "metraz", "pokoje", "status", "ostatnia_cena", "cena_m2")
+    list_filter = ("status", "inwestycja")
+    search_fields = ("adres", "inwestycja__nazwa")

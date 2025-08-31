@@ -1,46 +1,36 @@
-# oferty/models.py
 from django.db import models
 from django.utils import timezone
 
-STATUS_CHOICES = [
-    ("dostepne", "Dostępne"),
-    ("rezerwacja", "Rezerwacja"),
-    ("sprzedane", "Sprzedane"),
-]
-
-
 class Inwestycja(models.Model):
-    nazwa = models.CharField(max_length=100)
-    opis = models.TextField(blank=True)
-    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True)
-    data_dodania = models.DateTimeField(default=timezone.now)
-
-
-    class Meta:
-        verbose_name = "Inwestycja"
-        verbose_name_plural = "Inwestycje"
+    nazwa = models.CharField(max_length=255)
+    adres = models.CharField(max_length=255)
+    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
+    data_dodania = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nazwa
 
 
 class Oferta(models.Model):
-    inwestycja = models.ForeignKey(
-        Inwestycja, on_delete=models.CASCADE, related_name="oferty"
-    )
-    adres = models.CharField(max_length=255)
-    metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    cena = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostepne")
-    pokoje = models.IntegerField(null=True, blank=True)
-    zdjecie = models.ImageField(upload_to="oferty/", blank=True, null=True)
-    data_dodania = models.DateTimeField(default=timezone.now, editable=False)
+    STATUS_CHOICES = [
+        ("dostepne", "Dostępne"),
+        ("sprzedane", "Sprzedane"),
+        ("rezerwacja", "Rezerwacja"),
+    ]
 
-    class Meta:
-        verbose_name = "Oferta"
-        verbose_name_plural = "Oferty"
+    inwestycja = models.ForeignKey(Inwestycja, on_delete=models.CASCADE, related_name="oferty")
+    adres = models.CharField(max_length=255)
+    metraz = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    pokoje = models.PositiveIntegerField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostepne")
+    ostatnia_cena = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    data_dodania = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.inwestycja.nazwa} — {self.adres}"
+        return f"{self.adres} ({self.inwestycja.nazwa})"
 
-    
+    @property
+    def cena_m2(self):
+        if self.ostatnia_cena and self.metraz:
+            return self.ostatnia_cena / self.metraz
+        return None
