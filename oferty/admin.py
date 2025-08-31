@@ -4,9 +4,9 @@ from .models import Oferta, Inwestycja
 # Rejestracja modelu Inwestycja
 @admin.register(Inwestycja)
 class InwestycjaAdmin(admin.ModelAdmin):
-    list_display = ('nazwa', 'adres', 'data_dodania')
-    search_fields = ('nazwa', 'adres')
-    list_filter = ('data_dodania',)
+    list_display = ('nazwa', 'opis', 'zdjecie', 'data_dodania')  # tylko istniejące pola
+    search_fields = ('nazwa', 'opis')
+    list_filter = ('data_dodania',)  # tylko pola typu DateField/DateTimeField
 
 # Rejestracja modelu Oferta
 @admin.register(Oferta)

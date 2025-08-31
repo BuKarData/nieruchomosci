@@ -10,9 +10,11 @@ STATUS_CHOICES = [
 
 
 class Inwestycja(models.Model):
-    nazwa = models.CharField(max_length=255)
-    opis = models.TextField(blank=True, null=True)
-    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
+    nazwa = models.CharField(max_length=200)
+    opis = models.TextField(blank=True)
+    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True)
+    data_dodania = models.DateTimeField(auto_now_add=True)
+
 
     class Meta:
         verbose_name = "Inwestycja"
