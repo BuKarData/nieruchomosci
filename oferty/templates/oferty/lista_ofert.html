@@ -26,16 +26,14 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'oferty:home' %}">BZBUD</a>
+        <a class="navbar-brand" href="{% url 'home' %}">BZBUD</a>
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'oferty:home' %}"
-                >Strona główna</a
-              >
+              <a class="nav-link" href="{% url 'home' %}">Strona główna</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link fw-bold" href="{% url 'oferty:lista_ofert' %}"
+              <a class="nav-link fw-bold" href="{% url 'lista_ofert' %}"
                 >Oferta</a
               >
             </li>
@@ -57,24 +55,22 @@
             <th>Aktualna cena [zł]</th>
             <th>Cena za m² [zł/m²]</th>
             <th>Historia cen</th>
-            <th>Wykres</th>
           </tr>
         </thead>
         <tbody>
           {% for oferta in oferty %}
           <tr>
             <td>{{ oferta.adres }}</td>
-            <td>{{ oferta.metraz|default:"Brak"|floatformat:2 }}</td>
+            <td>{{ oferta.metraz|default:"Brak"|floatformat:1 }}</td>
             <td>{{ oferta.pokoje|default:"Brak" }}</td>
             <td>
-              <span class="status-{{ oferta.status|lower }}"
-                >{{ oferta.status|title }}</span
-              >
+              <span class="status-{{ oferta.status|lower }}">
+                {{ oferta.status|title }}
+              </span>
             </td>
             <td>
-              {% if oferta.ostatnia_cena %} {{
-              oferta.ostatnia_cena.kwota|intcomma }} zł ({{
-              oferta.ostatnia_cena.data }}) {% else %} Brak {% endif %}
+              {% if oferta.ostatnia_cena %} {{ oferta.ostatnia_cena|intcomma }}
+              zł {% else %} Brak {% endif %}
             </td>
             <td>
               {% if oferta.cena_m2 %} {{ oferta.cena_m2|intcomma }} zł/m² {%
@@ -84,16 +80,6 @@
               {% if oferta.ceny_list %} {% for cena in oferta.ceny_list %} {{
               cena.kwota|intcomma }} zł ({{ cena.data }})<br />
               {% endfor %} {% else %} Brak historii {% endif %}
-            </td>
-            <td>
-              {% if oferta.chart_data %}
-              <canvas
-                id="chart-{{ oferta.id }}"
-                width="300"
-                height="150"
-                data-chart="{{ oferta.chart_data|safe }}"
-              ></canvas>
-              {% else %} Brak danych {% endif %}
             </td>
           </tr>
           {% endfor %}
