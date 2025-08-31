@@ -1,7 +1,7 @@
 from django.db import models
 from decimal import Decimal
 
-class Inwestycja(models.Model):
+class Inwestycja(models.Model):   # <-- to jest klasa, która tworzy tabelę "oferty_inwestycja"
     nazwa = models.CharField(max_length=255)
     opis = models.TextField(blank=True, null=True)
     zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
@@ -16,15 +16,15 @@ STATUS_CHOICES = [
     ('sprzedane', 'Sprzedane'),
 ]
 class Oferta(models.Model):
+    inwestycja = models.ForeignKey(Inwestycja, on_delete=models.CASCADE, related_name="oferty")
     adres = models.CharField(max_length=255)
-    metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
-    zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
-    pokoje = models.IntegerField(null=True, blank=True)
-    opis = models.TextField(blank=True, null=True)
-  
+    metraz = models.DecimalField(max_digits=8, decimal_places=2)
+    cena = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=50)
+
     def __str__(self):
-        return self.adres
+        return f"{self.inwestycja.nazwa} - {self.adres}"
+
 
 
 class Cena(models.Model):
