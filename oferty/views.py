@@ -11,46 +11,52 @@ from .forms import OfertaForm, CenaForm
  #   ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
   #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
+from decimal import Decimal
+from django.db.models import Prefetch
+
 def home(request):
-    # Prefetch cen dla każdej oferty
     ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
-    oferty = Oferta.objects.prefetch_related(ceny_prefetch).order_by('-data_dodania')
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
 
     for oferta in oferty:
         ceny = list(oferta.ceny.all())
-        oferta.ceny_list = []
+        oferta.ostatnia_cena = ceny[-1] if ceny else None
 
-        # przygotowanie listy cen jako float
-        for c in ceny:
+        # Cena
+        if oferta.ostatnia_cena and oferta.ostatnia_cena.kwota is not None:
             try:
-                kwota = float(str(c.kwota).replace(" ", "").replace(",", "."))
-                oferta.ceny_list.append({'kwota': kwota, 'data': c.data})
-            except (ValueError, TypeError):
-                continue
+                kwota = Decimal(oferta.ostatnia_cena.kwota)
+                oferta.ostatnia_cena_str = f"{int(kwota):,}".replace(",", " ") + " zł"
+            except (ValueError, TypeError, Decimal.InvalidOperation):
+                oferta.ostatnia_cena_str = "Brak"
+        else:
+            oferta.ostatnia_cena_str = "Brak"
 
-        # ostatnia cena
-        if oferta.ceny_list:
-            ostatnia = oferta.ceny_list[-1]
-            oferta.ostatnia_cena = ostatnia['kwota']
-            oferta.ostatnia_cena_str = f"{int(ostatnia['kwota']):,} zł ({ostatnia['data']})"
-
-            # cena za m²
-            if oferta.metraz:
-                cena_m2 = int(ostatnia['kwota'] / float(oferta.metraz))
-                oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
-            else:
+        # Cena za m²
+        if oferta.ostatnia_cena and oferta.metraz:
+            try:
+                kwota = Decimal(oferta.ostatnia_cena.kwota)
+                cena_m2 = int(kwota / Decimal(oferta.metraz))
+                oferta.cena_m2_str = f"{cena_m2:,}".replace(",", " ") + " zł/m²"
+            except (ValueError, TypeError, Decimal.InvalidOperation, ZeroDivisionError):
                 oferta.cena_m2_str = "Brak"
         else:
-            oferta.ostatnia_cena = None
-            oferta.ostatnia_cena_str = "Brak"
             oferta.cena_m2_str = "Brak"
 
-        # status
-        oferta.status_class = f"status-{oferta.status.lower()}"
-        oferta.status_str = oferta.status.title()
+        # Metraż
+        oferta.metraz_str = f"{float(oferta.metraz):.1f}" if oferta.metraz else "Brak"
 
-    return render(request, "oferty/home.html", {"oferty": oferty})
+        # Status
+        raw_status = (str(oferta.status) or "").lower()
+        oferta.status_str = oferta.get_status_display() if hasattr(oferta, "get_status_display") else raw_status.capitalize()
+        if "sprzed" in raw_status:
+            oferta.status_class = "badge bg-danger"
+        elif "rezerw" in raw_status:
+            oferta.status_class = "badge bg-warning text-dark"
+        else:
+            oferta.status_class = "badge bg-success"
 
+    return render(request, "home.html", {"oferty": oferty})
 
 
 
