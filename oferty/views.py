@@ -11,32 +11,31 @@ from .forms import OfertaForm, CenaForm
  #   ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
   #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
+
+
 def home(request):
-    ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
+    ceny_prefetch = Prefetch("ceny", queryset=Cena.objects.order_by("data"))
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by("-data_dodania")
 
-    if ostatnia_oferta:
-        # Status CSS i tekst
-        ostatnia_oferta.status_class = f"status-{ostatnia_oferta.status.lower()}"
-        ostatnia_oferta.status_str = ostatnia_oferta.status.title()
+    for oferta in oferty:
+        ceny = list(oferta.ceny.all())
+        oferta.ceny_list = []
+        for c in ceny:
+            try:
+                kwota = float(c.kwota)
+                oferta.ceny_list.append({"kwota": kwota, "data": c.data})
+            except (ValueError, TypeError):
+                continue
 
-        # Metraż jako string
-        ostatnia_oferta.metraz_str = f"{ostatnia_oferta.metraz:.1f}" if ostatnia_oferta.metraz else "Brak"
-
-        # Ostatnia cena i cena za m²
-        ostatnia_cena = ostatnia_oferta.ceny.order_by('-data').first()
-        if ostatnia_cena:
-            kwota = float(ostatnia_cena.kwota)
-            ostatnia_oferta.ostatnia_cena_str = f"{int(kwota):,} zł ({ostatnia_cena.data})"
-            if ostatnia_oferta.metraz:
-                cena_m2 = int(kwota / float(ostatnia_oferta.metraz))
-                ostatnia_oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
-            else:
-                ostatnia_oferta.cena_m2_str = "Brak"
+        if oferta.ceny_list:
+            ostatnia = oferta.ceny_list[-1]
+            oferta.ostatnia_cena = ostatnia
+            oferta.cena_m2 = int(ostatnia["kwota"] / float(oferta.metraz)) if oferta.metraz else None
         else:
-            ostatnia_oferta.ostatnia_cena_str = "Brak"
-            ostatnia_oferta.cena_m2_str = "Brak"
+            oferta.ostatnia_cena = None
+            oferta.cena_m2 = None
 
-    return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
+    return render(request, "home.html", {"oferty": oferty})
 
 
 
