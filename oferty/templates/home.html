@@ -63,39 +63,57 @@
         STRONA W BUDOWIE - OFERTY TESTOWE - Budujemy Twój komfort.
       </p>
 
-      <div class="col-md-8">
-        <h4 class="card-title">Nasza najświeższa inwestycja</h4>
-        <p><strong>Adres:</strong> {{ oferta.adres }}</p>
-        <p><strong>Metraż:</strong> {{ oferta.metraz }} m²</p>
-        <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
-        
-        <p>
-          <strong>Status:</strong>
-          {% if oferta.status == "dostepny" %}
-            <span class="badge bg-success">Dostępny</span>
-          {% elif oferta.status == "rezerwacja" %}
-            <span class="badge bg-warning text-dark">Rezerwacja</span>
-          {% elif oferta.status == "sprzedane" %}
-            <span class="badge bg-danger">Sprzedane</span>
-          {% else %}
-            <span class="badge bg-secondary">{{ oferta.status }}</span>
-          {% endif %}
-        </p>
+      {% if ostatnia_oferta %}
+      <div class="card mb-4 shadow-sm">
+        <div class="row g-0">
+          <div class="col-md-4">
+            {% if ostatnia_oferta.zdjecie %}
+              <img src="{{ ostatnia_oferta.zdjecie.url }}" class="img-fluid rounded-start" alt="Zdjęcie inwestycji">
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h4 class="card-title">Nasza najświeższa inwestycja</h4>
+              <p><strong>Adres:</strong> {{ ostatnia_oferta.adres }}</p>
+              <p><strong>Metraż:</strong> {{ ostatnia_oferta.metraz }} m²</p>
+              <p><strong>Pokoje:</strong> {{ ostatnia_oferta.pokoje }}</p>
       
-        {% if oferta.ostatnia_cena %}
-          <p><strong>Cena:</strong> {{ oferta.ostatnia_cena.kwota|floatformat:0 }} zł</p>
-          {% if oferta.cena_m2 %}
-            <p><strong>Cena za m²:</strong> {{ oferta.cena_m2|floatformat:0 }} zł</p>
-          {% endif %}
-        {% else %}
-          <p><strong>Cena:</strong> Brak</p>
-        {% endif %}
+              <p>
+                <strong>Status:</strong>
+                {% if ostatnia_oferta.status == "dostepny" %}
+                  <span class="badge bg-success">Dostępny</span>
+                {% elif ostatnia_oferta.status == "rezerwacja" %}
+                  <span class="badge bg-warning text-dark">Rezerwacja</span>
+                {% elif ostatnia_oferta.status == "sprzedane" %}
+                  <span class="badge bg-danger">Sprzedane</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ ostatnia_oferta.status }}</span>
+                {% endif %}
+              </p>
       
-        <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
-          Zobacz wszystkie oferty
-        </a>
+              {% if ostatnia_oferta.ostatnia_cena %}
+                <p><strong>Cena:</strong> {{ ostatnia_oferta.ostatnia_cena.kwota|floatformat:0 }} zł</p>
+                {% if ostatnia_oferta.cena_m2 %}
+                  <p><strong>Cena za m²:</strong> {{ ostatnia_oferta.cena_m2|floatformat:0 }} zł</p>
+                {% endif %}
+              {% else %}
+                <p><strong>Cena:</strong> Brak</p>
+              {% endif %}
+      
+              <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
+                Zobacz wszystkie oferty
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
+      {% else %}
+        <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
+      {% endif %}
       
+      
+
+ 
 
     <style>
       .inwestycja-img {
