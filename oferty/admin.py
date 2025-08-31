@@ -17,11 +17,6 @@ class OfertaAdmin(admin.ModelAdmin):
         return f"{ostatnia_cena.kwota} zł" if ostatnia_cena else "Brak"
     ostatnia_cena_display.short_description = 'Aktualna cena'
 
-@admin.register(Cena)
-class CenaAdmin(admin.ModelAdmin):
-    list_display = ('oferta', 'kwota', 'data')
-    list_filter = ('data',)
-    search_fields = ('oferta__adres',)
 
 @admin.register(Inwestycja)
 class InwestycjaAdmin(admin.ModelAdmin):
