@@ -63,59 +63,39 @@
         STRONA W BUDOWIE - OFERTY TESTOWE - Budujemy Twój komfort.
       </p>
 
-      {% if oferty %} {% for oferta in oferty %}
-      <div class="card mb-4 shadow-sm">
-        <div class="row g-0">
-          <!-- LEWA STRONA: OPIS -->
-          <div class="col-md-8">
-            <div class="card-body">
-              <h4 class="card-title">Inwestycja</h4>
-              <p><strong>Adres:</strong> {{ oferta.adres }}</p>
-              <p><strong>Metraż:</strong> {{ oferta.metraz }} m²</p>
-              <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
-              <p>
-                <strong>Status:</strong>
-                <span class="{{ oferta.status_class }}">
-                  {{ oferta.status_str }}
-                </span>
-              </p>
-              {% if oferta.ostatnia_cena %}
-              <p><strong>Cena:</strong> {{ oferta.ostatnia_cena.kwota }}</p>
-              <p><strong>Cena za m²:</strong> {{ oferta.cena_m2 }}</p>
-              {% else %}
-              <p><strong>Cena:</strong> Brak</p>
-              {% endif %}
-
-              <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
-                Zobacz szczegóły
-              </a>
-            </div>
-          </div>
-
-          <!-- PRAWA STRONA: ZDJĘCIE -->
-          <div class="col-md-4 d-flex align-items-center">
-            {% if oferta.zdjecie %}
-            <img
-              src="{{ oferta.zdjecie.url }}"
-              alt="Zdjęcie inwestycji"
-              class="img-fluid rounded-end"
-              style="width: 100%; height: 100%; object-fit: cover"
-            />
-            {% else %}
-            <img
-              src="{% static 'img/brak_zdjecia.jpg' %}"
-              alt="Brak zdjęcia"
-              class="img-fluid rounded-end"
-              style="width: 100%; height: 100%; object-fit: cover"
-            />
-            {% endif %}
-          </div>
-        </div>
+      <div class="col-md-8">
+        <h4 class="card-title">Nasza najświeższa inwestycja</h4>
+        <p><strong>Adres:</strong> {{ oferta.adres }}</p>
+        <p><strong>Metraż:</strong> {{ oferta.metraz }} m²</p>
+        <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
+        
+        <p>
+          <strong>Status:</strong>
+          {% if oferta.status == "dostepny" %}
+            <span class="badge bg-success">Dostępny</span>
+          {% elif oferta.status == "rezerwacja" %}
+            <span class="badge bg-warning text-dark">Rezerwacja</span>
+          {% elif oferta.status == "sprzedane" %}
+            <span class="badge bg-danger">Sprzedane</span>
+          {% else %}
+            <span class="badge bg-secondary">{{ oferta.status }}</span>
+          {% endif %}
+        </p>
+      
+        {% if oferta.ostatnia_cena %}
+          <p><strong>Cena:</strong> {{ oferta.ostatnia_cena.kwota|floatformat:0 }} zł</p>
+          {% if oferta.cena_m2 %}
+            <p><strong>Cena za m²:</strong> {{ oferta.cena_m2|floatformat:0 }} zł</p>
+          {% endif %}
+        {% else %}
+          <p><strong>Cena:</strong> Brak</p>
+        {% endif %}
+      
+        <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-3">
+          Zobacz wszystkie oferty
+        </a>
       </div>
-      {% endfor %} {% else %}
-      <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
-      {% endif %}
-    </div>
+      
 
     <style>
       .inwestycja-img {
