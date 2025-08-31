@@ -83,9 +83,11 @@ if not _DB_URL:
     _DB_URL = "sqlite:///db.sqlite3"
 
 DATABASES = {
-    "default": dj_database_url.parse(_DB_URL, conn_max_age=600, ssl_require=False)
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_PUBLIC_URL'),  # Railway / .env powinno ustawiać tę zmienną
+        conn_max_age=600
+    )
 }
-
 # Walidatory haseł
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
