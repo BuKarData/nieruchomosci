@@ -1,5 +1,6 @@
 # oferty/models.py
 from django.db import models
+from django.utils import timezone
 
 STATUS_CHOICES = [
     ("dostepne", "Dostępne"),
@@ -31,7 +32,7 @@ class Oferta(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostepne")
     pokoje = models.IntegerField(null=True, blank=True)
     zdjecie = models.ImageField(upload_to="oferty/", blank=True, null=True)
-    data_dodania = models.DateTimeField(auto_now_add=True)
+    data_dodania = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
         verbose_name = "Oferta"
@@ -39,3 +40,5 @@ class Oferta(models.Model):
 
     def __str__(self):
         return f"{self.inwestycja.nazwa} — {self.adres}"
+
+    
