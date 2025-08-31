@@ -21,7 +21,8 @@ class Oferta(models.Model):
     zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
     pokoje = models.IntegerField(null=True, blank=True)
     opis = models.TextField(blank=True, null=True)
-   def __str__(self):
+  
+    def __str__(self):
         return self.adres
 
 
