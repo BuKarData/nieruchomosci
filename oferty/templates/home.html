@@ -65,38 +65,33 @@
 
       <div class="container mt-5">
         <h1 class="text-center mb-4">Nasze inwestycje</h1>
-    
+      
         {% if oferty %}
-            {% for oferta in oferty %}
-                <div class="card oferta-card shadow-sm">
-                    <div class="row g-0">
-                        {% if oferta.zdjecie %}
-                        <div class="col-md-4">
-                            <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" class="oferta-img">
-                        </div>
-                        {% endif %}
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h4 class="card-title">Inwestycja: {{ oferta.adres }}</h4>
-                                <p><strong>Metraż:</strong> {{ oferta.metraz_str }} m²</p>
-                                <p><strong>Pokoje:</strong> {{ oferta.pokoje }}</p>
-                                <p>
-                                    <strong>Status:</strong>
-                                    <span class="{{ oferta.status_class }}">{{ oferta.status_str }}</span>
-                                </p>
-                                <p><strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}</p>
-                                <p><strong>Cena za m²:</strong> {{ oferta.cena_m2_str }}</p>
-                                <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-2">Zobacz szczegóły</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+          {% for oferta in oferty %}
+            <div class="card shadow-sm oferta-card">
+              <div class="card-body oferta-body">
+                <h4 class="card-title">{{ oferta.adres }}</h4>
+                <p><strong>Metraż:</strong> {{ oferta.metraz_str }} m²</p>
+                <p><strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}</p>
+                <p><strong>Cena za m²:</strong> {{ oferta.cena_m2_str }}</p>
+                <p>
+                  <strong>Status:</strong>
+                  <span class="{{ oferta.status_class }}">{{ oferta.status_str }}</span>
+                </p>
+                <a href="{% url 'lista_ofert' %}" class="btn btn-primary mt-2">Zobacz szczegóły</a>
+              </div>
+      
+              {% if oferta.zdjecie %}
+              <div class="oferta-image">
+                <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji">
+              </div>
+              {% endif %}
+            </div>
+          {% endfor %}
         {% else %}
-            <p class="text-center mt-5">Brak inwestycji do wyświetlenia.</p>
+          <p class="text-center">Brak inwestycji do wyświetlenia.</p>
         {% endif %}
-    </div>
- 
+      </div>
 
     <style>
       .inwestycja-img {
