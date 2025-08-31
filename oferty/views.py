@@ -2,6 +2,7 @@
 from decimal import Decimal, InvalidOperation
 from django.shortcuts import render
 from django.db.models import Prefetch
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Inwestycja, Oferta
 
