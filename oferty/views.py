@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db.models import Prefetch
-from .models import Oferta, Cena
+from .models import Oferta, Cena, Inwestycja
 from .forms import OfertaForm, CenaForm
 
 
@@ -15,7 +15,7 @@ from decimal import Decimal
 
 # Lista ofert
 from django.shortcuts import render
-from .models import Inwestycja, Oferta, Cena
+
 
 
 def home(request):
