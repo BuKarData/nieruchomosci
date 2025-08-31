@@ -73,7 +73,7 @@ TEMPLATES = [
 
 # weź URL z kilku możliwych nazw, bo na Railway bywa różnie
 _DB_URL = (
-    os.getenv("DATABASE_PUBLIC_URL")
+    os.getenv("DATABASE_URL")
     or os.getenv("RAILWAY_DATABASE_URL")
     or os.getenv("POSTGRES_URL")          # czasem plugin wystawia też taką zmienną
 )
@@ -83,11 +83,9 @@ if not _DB_URL:
     _DB_URL = "sqlite:///db.sqlite3"
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_PUBLIC_URL'),  # Railway / .env powinno ustawiać tę zmienną
-        conn_max_age=600
-    )
+    "default": dj_database_url.parse(_DB_URL, conn_max_age=600, ssl_require=False)
 }
+
 # Walidatory haseł
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
