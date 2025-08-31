@@ -22,7 +22,6 @@
         font-weight: bold;
       }
 
-      /* Karty inwestycji */
       .oferta-card {
         display: flex;
         flex-wrap: wrap;
@@ -31,15 +30,15 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
       .oferta-body {
-        flex: 1 1 300px;
+        flex: 1 1 60%;
         padding: 15px;
       }
       .oferta-image {
-        flex: 0 0 350px;
-        padding: 15px;
+        flex: 0 0 40%;
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 15px;
       }
       .oferta-image img {
         width: 100%;
@@ -61,14 +60,16 @@
         background-color: #dc3545;
       }
 
-      /* Przycisk hover */
       .btn-hover-fill {
-        transition: 0.3s;
+        background-color: transparent;
+        color: #0d6efd;
+        border: 2px solid #0d6efd;
+        transition: all 0.3s ease;
       }
+
       .btn-hover-fill:hover {
-        background-color: #0056b3 !important;
-        border-color: #0056b3 !important;
-        color: #fff !important;
+        background-color: #0d6efd;
+        color: #fff;
       }
 
       /* Sekcja "O nas" */
@@ -146,7 +147,7 @@
             <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
             <button
               type="button"
-              class="btn btn-primary mt-2 btn-hover-fill"
+              class="btn btn-hover-fill mt-2"
               data-bs-toggle="modal"
               data-bs-target="#modal{{ oferta.id }}"
             >
