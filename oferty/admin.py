@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Oferta, Cena, Inwestycja
+from .models import Oferta, Inwestycja
 
 class CenaInline(admin.TabularInline):
     model = Cena
