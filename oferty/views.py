@@ -11,49 +11,45 @@ from .forms import OfertaForm, CenaForm
  #   ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
   #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
-
 def home(request):
+    # Prefetch cen dla każdej oferty
     ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
-    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
+    oferty = Oferta.objects.prefetch_related(ceny_prefetch).order_by('-data_dodania')
 
-    for o in oferty:
-        ceny = list(o.ceny.all())
-        o.ostatnia_cena = ceny[-1] if ceny else None
+    for oferta in oferty:
+        ceny = list(oferta.ceny.all())
+        oferta.ceny_list = []
 
-        # Cena główna
-        if o.ostatnia_cena and o.ostatnia_cena.kwota is not None:
+        # przygotowanie listy cen jako float
+        for c in ceny:
             try:
-                kwota = Decimal(o.ostatnia_cena.kwota)
-                o.ostatnia_cena_str = f"{int(kwota):,}".replace(",", " ") + " zł"
-            except:
-                o.ostatnia_cena_str = "Brak"
+                kwota = float(str(c.kwota).replace(" ", "").replace(",", "."))
+                oferta.ceny_list.append({'kwota': kwota, 'data': c.data})
+            except (ValueError, TypeError):
+                continue
+
+        # ostatnia cena
+        if oferta.ceny_list:
+            ostatnia = oferta.ceny_list[-1]
+            oferta.ostatnia_cena = ostatnia['kwota']
+            oferta.ostatnia_cena_str = f"{int(ostatnia['kwota']):,} zł ({ostatnia['data']})"
+
+            # cena za m²
+            if oferta.metraz:
+                cena_m2 = int(ostatnia['kwota'] / float(oferta.metraz))
+                oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
+            else:
+                oferta.cena_m2_str = "Brak"
         else:
-            o.ostatnia_cena_str = "Brak"
+            oferta.ostatnia_cena = None
+            oferta.ostatnia_cena_str = "Brak"
+            oferta.cena_m2_str = "Brak"
 
-        # Cena za m²
-        if o.ostatnia_cena and o.metraz:
-            try:
-                cena_m2 = Decimal(o.ostatnia_cena.kwota) / Decimal(o.metraz)
-                o.cena_m2_str = f"{int(cena_m2):,}".replace(",", " ") + " zł/m²"
-            except:
-                o.cena_m2_str = "Brak"
-        else:
-            o.cena_m2_str = "Brak"
+        # status
+        oferta.status_class = f"status-{oferta.status.lower()}"
+        oferta.status_str = oferta.status.title()
 
-        # Metraż
-        o.metraz_str = f"{float(o.metraz):.1f}" if o.metraz else "Brak"
-
-        # Status
-        raw_status = (str(o.status) or "").lower()
-        o.status_str = o.get_status_display() if hasattr(o, "get_status_display") else raw_status.capitalize()
-        if "sprzed" in raw_status:
-            o.status_class = "badge bg-danger"
-        elif "rezerw" in raw_status:
-            o.status_class = "badge bg-warning text-dark"
-        else:
-            o.status_class = "badge bg-success"
-
-    return render(request, "home.html", {"oferty": oferty})
+    return render(request, "oferty/home.html", {"oferty": oferty})
 
 
 
