@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db.models import Prefetch
-from .models import Oferta, Cena, Inwestycja
+from .models import Oferta, Inwestycja
 from .forms import OfertaForm, CenaForm
 
 
