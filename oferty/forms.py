@@ -1,15 +1,13 @@
-# oferty/forms.py
 from django import forms
-from .models import Inwestycja, Oferta
-
-
-class InwestycjaForm(forms.ModelForm):
-    class Meta:
-        model = Inwestycja
-        fields = ["nazwa", "opis", "zdjecie"]
-
+from .models import Oferta, Cena
 
 class OfertaForm(forms.ModelForm):
     class Meta:
         model = Oferta
-        fields = ["inwestycja", "adres", "metraz", "cena", "status", "pokoje", "zdjecie"]
+        fields = ['adres', 'metraz', 'pokoje', 'status']  
+
+
+class CenaForm(forms.ModelForm):
+    class Meta:
+        model = Cena
+        fields = ['oferta', 'kwota', 'data']

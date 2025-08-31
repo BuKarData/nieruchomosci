@@ -1,72 +1,111 @@
-# oferty/views.py
-from decimal import Decimal, InvalidOperation
-from django.shortcuts import render
-from django.db.models import Prefetch
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
-
-from .models import Inwestycja, Oferta
-
-
-def _format_price(value):
-    """Zwraca '300 000 zł' lub 'Brak'"""
-    if value is None:
-        return "Brak"
-    try:
-        q = Decimal(value)
-        # zaokrąglamy do całych zł
-        liczba = int(q)
-        return f"{liczba:,}".replace(",", " ") + " zł"
-    except (InvalidOperation, TypeError, ValueError):
-        try:
-            liczba = int(float(value))
-            return f"{liczba:,}".replace(",", " ") + " zł"
-        except Exception:
-            return "Brak"
+from django.http import JsonResponse
+from django.db.models import Prefetch
+from .models import Oferta, Cena
+from .forms import OfertaForm, CenaForm
 
 
-def _format_metraz(value):
-    if value is None:
-        return "Brak"
-    try:
-        return f"{float(value):.2f}"
-    except Exception:
-        return str(value)
-
-
-def _status_badge(value):
-    raw = (str(value) or "").lower()
-    label = value
-    css = "badge bg-success"
-    if "sprzed" in raw:
-        css = "badge bg-danger"
-    elif "rezerw" in raw:
-        css = "badge bg-warning text-dark"
-    return (label, css)
-
+# Strona główna
+#def home(request):
+ #   ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
+  #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
 def home(request):
-    # Prefetch ofert, żeby zminimalizować zapytania
-    oferty_qs = Oferta.objects.all().order_by("adres")
-    inwestycje = Inwestycja.objects.prefetch_related(Prefetch("oferty", queryset=oferty_qs)).all()
+    ostatnia_oferta = Oferta.objects.order_by('-data_dodania').first()
 
-    # Przygotuj pola do wyświetlenia w szablonie
-    for inv in inwestycje:
-        for of in inv.oferty.all():
-            of.cena_str = _format_price(of.cena)
-            of.metraz_str = _format_metraz(of.metraz)
-            of.status_str, of.status_class = _status_badge(of.status)
+    if ostatnia_oferta:
+        # Status CSS i tekst
+        ostatnia_oferta.status_class = f"status-{ostatnia_oferta.status.lower()}"
+        ostatnia_oferta.status_str = ostatnia_oferta.status.title()
 
-    return render(request, "home.html", {"inwestycje": inwestycje})
+        # Metraż jako string
+        ostatnia_oferta.metraz_str = f"{ostatnia_oferta.metraz:.1f}" if ostatnia_oferta.metraz else "Brak"
+
+        # Ostatnia cena i cena za m²
+        ostatnia_cena = ostatnia_oferta.ceny.order_by('-data').first()
+        if ostatnia_cena:
+            kwota = float(ostatnia_cena.kwota)
+            ostatnia_oferta.ostatnia_cena_str = f"{int(kwota):,} zł ({ostatnia_cena.data})"
+            if ostatnia_oferta.metraz:
+                cena_m2 = int(kwota / float(ostatnia_oferta.metraz))
+                ostatnia_oferta.cena_m2_str = f"{cena_m2:,} zł/m²"
+            else:
+                ostatnia_oferta.cena_m2_str = "Brak"
+        else:
+            ostatnia_oferta.ostatnia_cena_str = "Brak"
+            ostatnia_oferta.cena_m2_str = "Brak"
+
+    return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
+
+
+
+# Lista ofert
+from django.shortcuts import render
+from django.db.models import Prefetch
+from .models import Oferta, Cena
 
 
 def lista_ofert(request):
-    oferty = Oferta.objects.select_related("inwestycja").order_by("-data_dodania")
-    for of in oferty:
-        of.cena_str = _format_price(of.cena)
-        of.metraz_str = _format_metraz(of.metraz)
-        of.status_str, of.status_class = _status_badge(of.status)
+    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
+
+    for oferta in oferty:
+        ceny = list(oferta.ceny.all())
+        oferta.ceny_list = []  # lista dla historii cen
+
+        for c in ceny:
+            try:
+                kwota = float(c.kwota)
+                oferta.ceny_list.append({'kwota': kwota, 'data': c.data})
+            except (ValueError, TypeError):
+                continue
+
+        if oferta.ceny_list:
+            ostatnia = oferta.ceny_list[-1]
+            oferta.ostatnia_cena = ostatnia
+            oferta.cena_m2 = int(ostatnia['kwota'] / float(oferta.metraz)) if oferta.metraz else None
+        else:
+            oferta.ostatnia_cena = None
+            oferta.cena_m2 = None
+
+        oferta.chart_data = {
+            "labels": [str(c['data']) for c in oferta.ceny_list],
+            "data": [c['kwota'] for c in oferta.ceny_list],
+        }
+        
+    
+
     return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
+
+
+
+# Dodawanie oferty
+def dodaj_oferte(request):
+    if request.method == "POST":
+        form = OfertaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_ofert')
+    else:
+        form = OfertaForm()
+    return render(request, "oferty/dodaj_oferte.html", {"form": form})
+
+
+# Dodawanie ceny
+def dodaj_cene(request, oferta_id):
+    oferta = get_object_or_404(Oferta, id=oferta_id)
+    if request.method == "POST":
+        form = CenaForm(request.POST)
+        if form.is_valid():
+            cena = form.save(commit=False)
+            cena.oferta = oferta
+            cena.save()
+            return redirect('lista_ofert')
+    else:
+        form = CenaForm()
+    return render(request, "oferty/dodaj_cene.html", {"form": form, "oferta": oferta})
 
 
 # AJAX dodawanie ceny

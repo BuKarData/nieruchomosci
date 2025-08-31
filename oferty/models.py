@@ -1,36 +1,33 @@
 from django.db import models
-from django.utils import timezone
-
-class Inwestycja(models.Model):
-    nazwa = models.CharField(max_length=255)
-    adres = models.CharField(max_length=255)
-    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
-    data_dodania = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.nazwa
+from decimal import Decimal
 
 
 class Oferta(models.Model):
     STATUS_CHOICES = [
-        ("dostepne", "Dostępne"),
+        ("dostępne", "Dostępne"),
         ("sprzedane", "Sprzedane"),
         ("rezerwacja", "Rezerwacja"),
     ]
 
-    inwestycja = models.ForeignKey(Inwestycja, on_delete=models.CASCADE, related_name="oferty")
     adres = models.CharField(max_length=255)
-    metraz = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    pokoje = models.PositiveIntegerField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostepne")
-    ostatnia_cena = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    data_dodania = models.DateTimeField(auto_now_add=True)
+    metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)  # np. 123.45 m2
+    pokoje = models.IntegerField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostępne")
+    data_dodania = models.DateTimeField(auto_now_add=True)  # data utworzenia rekordu
+    zdjecie = models.ImageField(upload_to='inwestycje/', blank=True, null=True)
+    def __str__(self):
+        return f"{self.adres} ({self.metraz} m², {self.pokoje} pok.)"
+
+
+class Cena(models.Model):
+    oferta = models.ForeignKey(Oferta, related_name="ceny", on_delete=models.CASCADE)
+    kwota = models.DecimalField(max_digits=12, decimal_places=2)
+
+  # np. 450000.00
+    data = models.DateField()
+
+    class Meta:
+        ordering = ["data"]  # zawsze sortuj ceny rosnąco po dacie
 
     def __str__(self):
-        return f"{self.adres} ({self.inwestycja.nazwa})"
-
-    @property
-    def cena_m2(self):
-        if self.ostatnia_cena and self.metraz:
-            return self.ostatnia_cena / self.metraz
-        return None
+        return f"{self.kwota} zł ({self.data})"
