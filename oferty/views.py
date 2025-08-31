@@ -14,49 +14,68 @@ from .forms import OfertaForm, CenaForm
 from decimal import Decimal
 from django.db.models import Prefetch
 
-def home(request):
-    inwestycje = Inwestycja.objects.prefetch_related('oferty').all()
-    return render(request, 'home.html', {'inwestycje': inwestycje})
+ # reszta logiki dla ofert/lokali
+
 
 
 
 # Lista ofert
 from django.shortcuts import render
-from django.db.models import Prefetch
-from .models import Oferta, Cena
+from .models import Inwestycja, Oferta, Cena
 
 
-def lista_ofert(request):
-    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
-    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
+def home(request):
+    # Pobranie wszystkich inwestycji
+    inwestycje = Inwestycja.objects.all()
 
-    for oferta in oferty:
-        ceny = list(oferta.ceny.all())
-        oferta.ceny_list = []  # lista dla historii cen
+    # Dla każdej inwestycji pobieramy powiązane oferty i ceny
+    for inwestycja in inwestycje:
+        oferty_prefetch = Prefetch('oferta_set', queryset=Oferta.objects.prefetch_related(
+            Prefetch('ceny', queryset=Cena.objects.order_by('data'))
+        ))
+        inwestycja.oferty = inwestycja.oferta_set.prefetch_related(oferty_prefetch).all()
 
-        for c in ceny:
-            try:
-                kwota = float(c.kwota)
-                oferta.ceny_list.append({'kwota': kwota, 'data': c.data})
-            except (ValueError, TypeError):
-                continue
+        # Przygotowanie danych dla każdej oferty
+        for oferta in inwestycja.oferty:
+            ceny = list(oferta.ceny.all())
+            oferta.ostatnia_cena = ceny[-1] if ceny else None
 
-        if oferta.ceny_list:
-            ostatnia = oferta.ceny_list[-1]
-            oferta.ostatnia_cena = ostatnia
-            oferta.cena_m2 = int(ostatnia['kwota'] / float(oferta.metraz)) if oferta.metraz else None
-        else:
-            oferta.ostatnia_cena = None
-            oferta.cena_m2 = None
+            # Cena
+            if oferta.ostatnia_cena and oferta.ostatnia_cena.kwota is not None:
+                kwota = oferta.ostatnia_cena.kwota
+                try:
+                    kwota_int = int(Decimal(kwota))
+                except:
+                    kwota_int = None
+                oferta.ostatnia_cena_str = f"{kwota_int:,}".replace(",", " ") + " zł" if kwota_int else "Brak"
+            else:
+                oferta.ostatnia_cena_str = "Brak"
 
-        oferta.chart_data = {
-            "labels": [str(c['data']) for c in oferta.ceny_list],
-            "data": [c['kwota'] for c in oferta.ceny_list],
-        }
-        
-    
+            # Cena za m²
+            if oferta.ostatnia_cena and oferta.metraz:
+                try:
+                    cena_m2 = int(Decimal(oferta.ostatnia_cena.kwota) / Decimal(oferta.metraz))
+                    oferta.cena_m2_str = f"{cena_m2:,}".replace(",", " ") + " zł/m²"
+                except:
+                    oferta.cena_m2_str = "Brak"
+            else:
+                oferta.cena_m2_str = "Brak"
 
-    return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
+            # Metraż
+            oferta.metraz_str = f"{float(oferta.metraz):.2f}" if oferta.metraz else "Brak"
+
+            # Status
+            raw_status = (str(oferta.status) or "").lower()
+            oferta.status_str = oferta.get_status_display() if hasattr(oferta, "get_status_display") else raw_status.capitalize()
+            if "sprzed" in raw_status:
+                oferta.status_class = "badge bg-danger"
+            elif "rezerw" in raw_status:
+                oferta.status_class = "badge bg-warning text-dark"
+            else:
+                oferta.status_class = "badge bg-success"
+
+    return render(request, "home.html", {"inwestycje": inwestycje})
+
 
 
 

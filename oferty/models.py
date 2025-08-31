@@ -4,10 +4,11 @@ from decimal import Decimal
 class Inwestycja(models.Model):
     nazwa = models.CharField(max_length=255)
     opis = models.TextField(blank=True, null=True)
-    zdjecie = models.ImageField(upload_to='inwestycje/', blank=True, null=True)
+    zdjecie = models.ImageField(upload_to='inwestycje/', null=True, blank=True)
 
     def __str__(self):
         return self.nazwa
+
 
 STATUS_CHOICES = [
     ('dostepne', 'Dostępne'),
