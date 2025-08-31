@@ -73,7 +73,10 @@ TEMPLATES = [
 
 # Baza danych
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_PUBLIC_URL'))
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_PUBLIC_URL'),
+        conn_max_age=600,
+    )
 }
 
 # Walidatory haseł
