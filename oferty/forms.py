@@ -1,13 +1,15 @@
 from django import forms
-from .models import Oferta, Cena
+from .models import Inwestycja, Oferta
 
+# -------- Formularz dla inwestycji --------
+class InwestycjaForm(forms.ModelForm):
+    class Meta:
+        model = Inwestycja
+        fields = ["nazwa", "opis", "zdjecie"]
+
+
+# -------- Formularz dla oferty/lokalu --------
 class OfertaForm(forms.ModelForm):
     class Meta:
         model = Oferta
-        # Upewnij się, że wymieniasz tylko istniejące pola:
-        fields = ['adres', 'metraz', 'status', 'zdjecie', 'opis', 'pokoje']  
-
-class CenaForm(forms.ModelForm):
-    class Meta:
-        model = Cena
-        fields = ['kwota', 'data']
+        fields = ["inwestycja", "adres", "metraz", "cena", "status", "pokoje"]
