@@ -12,30 +12,49 @@ from .forms import OfertaForm, CenaForm
   #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
 
-
 def home(request):
-    ceny_prefetch = Prefetch("ceny", queryset=Cena.objects.order_by("data"))
-    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by("-data_dodania")
+    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
 
-    for oferta in oferty:
-        ceny = list(oferta.ceny.all())
-        oferta.ceny_list = []
-        for c in ceny:
+    for o in oferty:
+        ceny = list(o.ceny.all())
+        o.ostatnia_cena = ceny[-1] if ceny else None
+
+        # Cena główna
+        if o.ostatnia_cena and o.ostatnia_cena.kwota is not None:
             try:
-                kwota = float(c.kwota)
-                oferta.ceny_list.append({"kwota": kwota, "data": c.data})
-            except (ValueError, TypeError):
-                continue
-
-        if oferta.ceny_list:
-            ostatnia = oferta.ceny_list[-1]
-            oferta.ostatnia_cena = ostatnia
-            oferta.cena_m2 = int(ostatnia["kwota"] / float(oferta.metraz)) if oferta.metraz else None
+                kwota = Decimal(o.ostatnia_cena.kwota)
+                o.ostatnia_cena_str = f"{int(kwota):,}".replace(",", " ") + " zł"
+            except:
+                o.ostatnia_cena_str = "Brak"
         else:
-            oferta.ostatnia_cena = None
-            oferta.cena_m2 = None
+            o.ostatnia_cena_str = "Brak"
+
+        # Cena za m²
+        if o.ostatnia_cena and o.metraz:
+            try:
+                cena_m2 = Decimal(o.ostatnia_cena.kwota) / Decimal(o.metraz)
+                o.cena_m2_str = f"{int(cena_m2):,}".replace(",", " ") + " zł/m²"
+            except:
+                o.cena_m2_str = "Brak"
+        else:
+            o.cena_m2_str = "Brak"
+
+        # Metraż
+        o.metraz_str = f"{float(o.metraz):.1f}" if o.metraz else "Brak"
+
+        # Status
+        raw_status = (str(o.status) or "").lower()
+        o.status_str = o.get_status_display() if hasattr(o, "get_status_display") else raw_status.capitalize()
+        if "sprzed" in raw_status:
+            o.status_class = "badge bg-danger"
+        elif "rezerw" in raw_status:
+            o.status_class = "badge bg-warning text-dark"
+        else:
+            o.status_class = "badge bg-success"
 
     return render(request, "home.html", {"oferty": oferty})
+
 
 
 
