@@ -9,11 +9,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
+
     <style>
       body,
       html {
         margin: 0;
-        height: 100%;
+        padding: 0;
       }
 
       /* Navbar */
@@ -24,31 +25,28 @@
       /* Karty inwestycji */
       .oferta-card {
         display: flex;
-        flex-direction: row;
-        gap: 20px;
-        margin-bottom: 30px;
         flex-wrap: wrap;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
-
       .oferta-body {
         flex: 1 1 300px;
+        padding: 15px;
       }
-
       .oferta-image {
-        flex: 0 0 320px;
+        flex: 0 0 350px;
+        padding: 15px;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 10px;
       }
-
       .oferta-image img {
         width: 100%;
         height: auto;
-        max-height: 240px;
+        max-height: 250px;
         object-fit: cover;
         border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
 
       /* Status */
@@ -63,11 +61,10 @@
         background-color: #dc3545;
       }
 
-      /* Przyciski hover */
+      /* Przycisk hover */
       .btn-hover-fill {
         transition: 0.3s;
       }
-
       .btn-hover-fill:hover {
         background-color: #0056b3 !important;
         border-color: #0056b3 !important;
@@ -95,6 +92,17 @@
         font-size: 14px;
         line-height: 1.4;
       }
+
+      /* Responsywność */
+      @media (max-width: 768px) {
+        .oferta-card {
+          flex-direction: column;
+        }
+        .oferta-image {
+          flex: 1 1 100%;
+          max-height: 200px;
+        }
+      }
     </style>
   </head>
 
@@ -119,40 +127,36 @@
     </nav>
 
     <div class="container mt-5">
-      <h1 class="text-center">Nasze inwestycje</h1>
+      <h1 class="text-center mb-5">Nasze inwestycje</h1>
 
       {% for oferta in oferty %}
-      <div class="card mb-4 shadow-sm">
-        <div class="row g-0">
-          <div class="col-md-8 p-3">
-            <h4>{{ oferta.adres }}</h4>
-            <p>Metraż: {{ oferta.metraz_str }} m²</p>
-            <p>
-              Status:
-              <span class="{{ oferta.status_class }}"
-                >{{ oferta.status_str }}</span
-              >
-            </p>
-            <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
-            <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
-            <button
-              type="button"
-              class="btn btn-primary mt-2 btn-hover-fill"
-              data-bs-toggle="modal"
-              data-bs-target="#modal{{ oferta.id }}"
+      <div class="card mb-4 shadow-sm oferta-card">
+        <div class="oferta-body">
+          <h4>{{ oferta.adres }}</h4>
+          <p>Metraż: {{ oferta.metraz_str }} m²</p>
+          <p>
+            Status:
+            <span class="{{ oferta.status_class }}"
+              >{{ oferta.status_str }}</span
             >
-              Zobacz szczegóły
-            </button>
-          </div>
-          <div
-            class="col-md-4 d-flex justify-content-center align-items-center p-3"
+          </p>
+          <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
+          <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
+          <button
+            type="button"
+            class="btn btn-primary mt-2 btn-hover-fill"
+            data-bs-toggle="modal"
+            data-bs-target="#modal{{ oferta.id }}"
           >
-            {% if oferta.zdjecie %}
-            <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" />
-            {% else %}
-            <img src="{% static 'placeholder.png' %}" alt="Brak zdjęcia" />
-            {% endif %}
-          </div>
+            Zobacz szczegóły
+          </button>
+        </div>
+        <div class="oferta-image">
+          {% if oferta.zdjecie %}
+          <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" />
+          {% else %}
+          <img src="{% static 'placeholder.png' %}" alt="Brak zdjęcia" />
+          {% endif %}
         </div>
       </div>
 
@@ -256,7 +260,6 @@
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       crossorigin="anonymous"
