@@ -12,12 +12,6 @@ from .forms import OfertaForm, CenaForm
   #  return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta})
 
 from decimal import Decimal
-from django.db.models import Prefetch
-
- # reszta logiki dla ofert/lokali
-
-
-
 
 # Lista ofert
 from django.shortcuts import render
@@ -75,6 +69,38 @@ def home(request):
                 oferta.status_class = "badge bg-success"
 
     return render(request, "home.html", {"inwestycje": inwestycje})
+
+def lista_ofert(request):
+    ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
+    oferty = Oferta.objects.all().prefetch_related(ceny_prefetch).order_by('-data_dodania')
+
+    for oferta in oferty:
+        ceny = list(oferta.ceny.all())
+        oferta.ostatnia_cena = ceny[-1] if ceny else None
+
+        # Cena
+        if oferta.ostatnia_cena and oferta.ostatnia_cena.kwota is not None:
+            try:
+                kwota_int = int(Decimal(oferta.ostatnia_cena.kwota))
+            except:
+                kwota_int = None
+            oferta.ostatnia_cena_str = f"{kwota_int:,}".replace(",", " ") + " zł" if kwota_int else "Brak"
+        else:
+            oferta.ostatnia_cena_str = "Brak"
+
+        # Cena za m²
+        if oferta.ostatnia_cena and oferta.metraz:
+            try:
+                cena_m2 = int(Decimal(oferta.ostatnia_cena.kwota) / Decimal(oferta.metraz))
+                oferta.cena_m2_str = f"{cena_m2:,}".replace(",", " ") + " zł/m²"
+            except:
+                oferta.cena_m2_str = "Brak"
+        else:
+            oferta.cena_m2_str = "Brak"
+
+        oferta.metraz_str = f"{float(oferta.metraz):.2f}" if oferta.metraz else "Brak"
+
+    return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
 
 
