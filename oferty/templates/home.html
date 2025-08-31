@@ -1,112 +1,48 @@
 <!DOCTYPE html>
 <html lang="pl">
   {% load static %}
-
   <head>
     <meta charset="UTF-8" />
-    <title>BZBUD Deweloper Zielonka</title>
+    <title>BZBUD Deweloper</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
-
     <style>
       body,
       html {
         margin: 0;
-        padding: 0;
-      }
-
-      /* Navbar */
-      .navbar-brand {
-        font-weight: bold;
-      }
-
-      .oferta-card {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
-      .oferta-body {
-        flex: 1 1 60%;
-        padding: 15px;
-      }
-      .oferta-image {
-        flex: 0 0 40%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px;
+        height: 100%;
       }
       .oferta-image img {
         width: 100%;
-        height: auto;
         max-height: 250px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 5px;
       }
-
-      /* Status */
-      .badge.bg-success {
-        background-color: #28a745;
+      .btn-hover:hover {
+        background-color: #0056b3;
+        color: white;
+        transition: 0.3s;
       }
-      .badge.bg-warning.text-dark {
-        background-color: #ffc107;
-        color: #212529;
+      .status-dostępne {
+        color: green;
+        font-weight: bold;
       }
-      .badge.bg-danger {
-        background-color: #dc3545;
+      .status-rezerwacja {
+        color: orange;
+        font-weight: bold;
       }
-
-      .btn-hover-fill {
-        background-color: transparent;
-        color: #0d6efd;
-        border: 2px solid #0d6efd;
-        transition: all 0.3s ease;
+      .status-sprzedane {
+        color: red;
+        font-weight: bold;
       }
-
-      .btn-hover-fill:hover {
-        background-color: #0d6efd;
-        color: #fff;
-      }
-
-      /* Sekcja "O nas" */
-      .o-nas img {
-        max-height: 300px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Blok kontaktowy */
-      .contact-box {
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 12px 18px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        font-size: 14px;
-        line-height: 1.4;
-      }
-
-      /* Responsywność */
-      @media (max-width: 768px) {
-        .oferta-card {
-          flex-direction: column;
-        }
-        .oferta-image {
-          flex: 1 1 100%;
-          max-height: 200px;
-        }
+      /* Estetyczne odstępy */
+      .card .row {
+        align-items: center;
       }
     </style>
   </head>
-
   <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 shadow-sm">
@@ -128,60 +64,59 @@
     </nav>
 
     <div class="container mt-5">
-      <h1 class="text-center mb-5">Nasze inwestycje</h1>
+      <h1 class="text-center">BZBUD</h1>
+      <p class="text-center text-muted">Budujemy Twój komfort.</p>
 
-      {% for oferta in oferty %}
-      <div class="card mb-4 shadow-sm oferta-card">
-        <div class="row g-0 align-items-center">
-          <!-- Tekst po lewej -->
-          <div class="col-md-8 p-3 oferta-body">
-            <h4>{{ oferta.adres }}</h4>
-            <p>Metraż: {{ oferta.metraz_str }} m²</p>
+      <!-- Podgląd ostatniej inwestycji -->
+      {% if ostatnia_oferta %}
+      <div class="card mb-4 shadow-sm">
+        <div class="row g-0">
+          <div class="col-md-8 p-3">
+            <h4>{{ ostatnia_oferta.adres }}</h4>
+            <p>Metraż: {{ ostatnia_oferta.metraz_str }} m²</p>
             <p>
               Status:
-              <span class="{{ oferta.status_class }}"
-                >{{ oferta.status_str }}</span
+              <span class="{{ ostatnia_oferta.status_class }}"
+                >{{ ostatnia_oferta.status_str }}</span
               >
             </p>
-            <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
-            <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
+            <p>Cena: {{ ostatnia_oferta.ostatnia_cena_str }}</p>
+            <p>Cena za m²: {{ ostatnia_oferta.cena_m2_str }}</p>
             <button
               type="button"
-              class="btn btn-hover-fill mt-2"
+              class="btn btn-primary btn-hover mt-2"
               data-bs-toggle="modal"
-              data-bs-target="#modal{{ oferta.id }}"
+              data-bs-target="#modalOferty"
             >
               Zobacz szczegóły
             </button>
           </div>
-
-          <!-- Zdjęcie po prawej -->
           <div
-            class="col-md-4 d-flex justify-content-center align-items-center p-3 oferta-image"
+            class="col-md-4 p-3 d-flex justify-content-center align-items-center"
           >
-            {% if oferta.zdjecie %}
-            <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie inwestycji" />
-            {% else %}
-            <img src="{% static 'placeholder.png' %}" alt="Brak zdjęcia" />
+            {% if ostatnia_oferta.zdjecie %}
+            <img
+              src="{{ ostatnia_oferta.zdjecie.url }}"
+              alt="Zdjęcie inwestycji"
+            />
             {% endif %}
           </div>
         </div>
       </div>
+      {% endif %}
 
-      <!-- Modal -->
+      <!-- Modal z wszystkimi ofertami -->
       <div
         class="modal fade"
-        id="modal{{ oferta.id }}"
+        id="modalOferty"
         tabindex="-1"
-        aria-labelledby="modalLabel{{ oferta.id }}"
+        aria-labelledby="modalOfertyLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="modalLabel{{ oferta.id }}">
-                {{ oferta.adres }}
-              </h5>
+              <h5 class="modal-title" id="modalOfertyLabel">Szczegóły ofert</h5>
               <button
                 type="button"
                 class="btn-close"
@@ -190,37 +125,41 @@
               ></button>
             </div>
             <div class="modal-body">
-              <p>{{ oferta.opis|default:"Brak opisu" }}</p>
-              {% if oferta.zdjecie %}
-              <img
-                src="{{ oferta.zdjecie.url }}"
-                alt="Zdjęcie inwestycji"
-                style="
-                  width: 100%;
-                  max-height: 400px;
-                  object-fit: cover;
-                  border-radius: 5px;
-                  margin-bottom: 15px;
-                "
-              />
-              {% endif %}
-              <ul class="list-group">
-                <li class="list-group-item">
-                  <strong>Metraż:</strong> {{ oferta.metraz_str }} m²
-                </li>
-                <li class="list-group-item">
-                  <strong>Status:</strong>
-                  <span class="{{ oferta.status_class }}"
-                    >{{ oferta.status_str }}</span
+              {% for oferta in oferty %}
+              <div class="card mb-3 shadow-sm">
+                <div class="row g-0">
+                  <div class="col-md-8 p-3">
+                    <h5>{{ oferta.adres }}</h5>
+                    <p>{{ oferta.opis|default:"Brak opisu" }}</p>
+                    <p>Metraż: {{ oferta.metraz_str }} m²</p>
+                    <p>
+                      Status:
+                      <span class="{{ oferta.status_class }}"
+                        >{{ oferta.status_str }}</span
+                      >
+                    </p>
+                    <p>Cena: {{ oferta.ostatnia_cena_str }}</p>
+                    <p>Cena za m²: {{ oferta.cena_m2_str }}</p>
+                  </div>
+                  <div
+                    class="col-md-4 p-3 d-flex justify-content-center align-items-center"
                   >
-                </li>
-                <li class="list-group-item">
-                  <strong>Cena:</strong> {{ oferta.ostatnia_cena_str }}
-                </li>
-                <li class="list-group-item">
-                  <strong>Cena za m²:</strong> {{ oferta.cena_m2_str }}
-                </li>
-              </ul>
+                    {% if oferta.zdjecie %}
+                    <img
+                      src="{{ oferta.zdjecie.url }}"
+                      alt="Zdjęcie inwestycji"
+                      style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 5px;
+                      "
+                    />
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
             </div>
             <div class="modal-footer">
               <button
@@ -234,47 +173,61 @@
           </div>
         </div>
       </div>
-      {% endfor %}
 
+      <!-- Przycisk Zobacz inne oferty -->
       <div class="text-center mt-4">
         <a
           href="{% url 'lista_ofert' %}"
-          class="btn btn-primary btn-lg btn-hover-fill"
+          class="btn btn-primary btn-lg btn-hover"
           >Zobacz inne oferty</a
         >
       </div>
 
-      <!-- Sekcja "O nas" -->
-      <section class="container my-5 py-5 bg-light rounded shadow-sm o-nas">
+      <!-- Sekcja O nas -->
+      <section class="container my-5 py-5 bg-light rounded shadow-sm">
         <div class="row align-items-center">
           <div class="col-md-6 mb-4 mb-md-0">
             <h2 class="mb-3">O nas</h2>
             <p class="lead">
               Rodzinna firma z Zielonki. Od lat budujemy komfortowe i nowoczesne
-              mieszkania oraz domy.
+              mieszkania oraz domy, stawiając na jakość i zadowolenie naszych
+              klientów.
             </p>
           </div>
           <div class="col-md-6 text-center">
-            <img src="{% static 'BZBUD.png' %}" alt="O nas" class="img-fluid" />
+            <img
+              src="{% static 'BZBUD.png' %}"
+              alt="O nas"
+              class="img-fluid rounded shadow-sm"
+              style="max-height: 300px; object-fit: cover"
+            />
           </div>
         </div>
       </section>
-
-      <!-- Kontakt -->
-      <div class="contact-box">
-        <strong>Kontakt:</strong><br />
-        tel: +48 696 362 748<br />
-        email: beatazochowska8@gmail.com
-      </div>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <!-- Blok kontaktowy -->
+    <div
+      style="
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 18px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        font-size: 14px;
+        line-height: 1.4;
+      "
+    >
+      <strong>Kontakt:</strong><br />
+      tel: +48 696 362 748<br />
+      email: beatazochowska8@gmail.com
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
   </body>
 </html>

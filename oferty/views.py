@@ -24,27 +24,27 @@ def home(request):
 
         # Cena
         if oferta.ostatnia_cena and oferta.ostatnia_cena.kwota is not None:
+            kwota = oferta.ostatnia_cena.kwota
             try:
-                kwota = Decimal(oferta.ostatnia_cena.kwota)
-                oferta.ostatnia_cena_str = f"{int(kwota):,}".replace(",", " ") + " zł"
-            except (ValueError, TypeError, Decimal.InvalidOperation):
-                oferta.ostatnia_cena_str = "Brak"
+                kwota_int = int(Decimal(kwota))
+            except:
+                kwota_int = None
+            oferta.ostatnia_cena_str = f"{kwota_int:,}".replace(",", " ") + " zł" if kwota_int else "Brak"
         else:
             oferta.ostatnia_cena_str = "Brak"
 
         # Cena za m²
         if oferta.ostatnia_cena and oferta.metraz:
             try:
-                kwota = Decimal(oferta.ostatnia_cena.kwota)
-                cena_m2 = int(kwota / Decimal(oferta.metraz))
+                kwota = oferta.ostatnia_cena.kwota
+                cena_m2 = int(Decimal(kwota) / Decimal(oferta.metraz))
                 oferta.cena_m2_str = f"{cena_m2:,}".replace(",", " ") + " zł/m²"
-            except (ValueError, TypeError, Decimal.InvalidOperation, ZeroDivisionError):
+            except:
                 oferta.cena_m2_str = "Brak"
         else:
             oferta.cena_m2_str = "Brak"
 
-        # Metraż
-        oferta.metraz_str = f"{float(oferta.metraz):.1f}" if oferta.metraz else "Brak"
+        oferta.metraz_str = f"{float(oferta.metraz):.2f}" if oferta.metraz else "Brak"
 
         # Status
         raw_status = (str(oferta.status) or "").lower()
@@ -56,7 +56,11 @@ def home(request):
         else:
             oferta.status_class = "badge bg-success"
 
-    return render(request, "home.html", {"oferty": oferty})
+    # Najnowsza oferta do podglądu na stronie głównej
+    ostatnia_oferta = oferty.first() if oferty else None
+
+    return render(request, "home.html", {"ostatnia_oferta": ostatnia_oferta, "oferty": oferty})
+
 
 
 
