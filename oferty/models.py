@@ -11,8 +11,9 @@ STATUS_CHOICES = [
 
 class Inwestycja(models.Model):
     nazwa = models.CharField(max_length=100)
+    opis = models.TextField(blank=True)
+    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True)
     data_dodania = models.DateTimeField(default=timezone.now)
-
 
 
     class Meta:
