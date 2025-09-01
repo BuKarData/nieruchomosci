@@ -67,11 +67,11 @@
   
   <!-- Zdjęcie inwestycji -->
   <div class="inwestycja-img me-4">
-    {% if inwestycja.zdjecie %}
+      {% if inwestycja.zdjecie %}
       <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-    {% else %}
+      {% else %}
       <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-    {% endif %}
+      {% endif %}
   </div>
 
   <!-- Opis inwestycji -->
@@ -96,7 +96,7 @@
             {% if oferta.cena_m2 %}
               ({{ oferta.cena_m2|floatformat:0 }} zł/m²)
             {% endif %}
-          {% else %}
+          {% empty %}
             - Brak ceny
           {% endif %}
         </li>
@@ -110,16 +110,7 @@
 <p>Brak inwestycji</p>
 {% endfor %}
 
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% empty %}
-<p>Brak inwestycji</p>
-{% endfor %}
-
-    
+ 
     <script>
     function showPopup(id){
         document.getElementById(id).style.display = 'block';
