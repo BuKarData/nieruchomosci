@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 {% load static %}
+{% load math_filters %}
 
 <head>
   <meta charset="UTF-8">
@@ -53,39 +54,57 @@
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
     <h1>Inwestycje</h1>
 
-    {% for inwestycja in inwestycje %}
-    <div class="inwestycja-box">
-        <h2>{{ inwestycja.nazwa }}</h2>
-        <p>{{ inwestycja.adres }}</p>
-        <button onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
-    
-        <div id="popup-{{ inwestycja.id }}" class="popup" style="display:none;">
-            <div class="popup-content">
-                <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
-                <h3>Oferty w {{ inwestycja.nazwa }}</h3>
-                <ul>
-                {% for oferta in inwestycja.oferta_set.all %}
-                    <li>
-                        {{ oferta.adres }} - {{ oferta.metraz }} m², {{ oferta.pokoje }} pok. - Status: {{ oferta.status }}
-                        {% if oferta.ostatnia_cena %}
-                            - Ostatnia cena: {{ oferta.ostatnia_cena }} zł
-                            {% if oferta.cena_m2 %}
-                                ({{ oferta.cena_m2|floatformat:0 }} zł/m²)
-                            {% endif %}
-                        {% else %}
-                            - Brak ceny
-                        {% endif %}
-                    </li>
-                {% empty %}
-                    <li>Brak ofert</li>
-                {% endfor %}
-                </ul>
-            </div>
+    <h1 class="text-center mb-4">Nasze inwestycje</h1>
+
+{% for inwestycja in inwestycje %}
+<div class="inwestycja-box">
+  <h2>{{ inwestycja.nazwa }}</h2>
+  <p>{{ inwestycja.adres }}</p>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inwestycjaModal{{ inwestycja.id }}">
+    Szczegóły inwestycji
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="inwestycjaModal{{ inwestycja.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Oferty w {{ inwestycja.nazwa }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
         </div>
+        <div class="modal-body">
+          {% if inwestycja.oferty.all %}
+            <ul class="list-group">
+              {% for oferta in inwestycja.oferty.all %}
+              <li class="list-group-item">
+                <strong>{{ oferta.adres }}</strong> – {{ oferta.metraz }} m², {{ oferta.pokoje }} pok.
+                <span class="badge bg-secondary">{{ oferta.get_status_display }}</span>
+                <br>
+                {% if oferta.ceny.exists %}
+                  {% with ostatnia=oferta.ceny.last %}
+                    Cena: {{ ostatnia.kwota|floatformat:0 }} zł ({{ ostatnia.data }})
+                    {% if oferta.metraz %}
+                      – {{ ostatnia.kwota|div:oferta.metraz|floatformat:0 }} zł/m²
+                    {% endif %}
+                  {% endwith %}
+                {% else %}
+                  Brak ceny
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Brak ofert dla tej inwestycji.</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
-    {% empty %}
-    <p>Brak inwestycji</p>
-    {% endfor %}
+  </div>
+</div>
+{% empty %}
+<p>Brak inwestycji</p>
+{% endfor %}
+
     
     <script>
     function showPopup(id){

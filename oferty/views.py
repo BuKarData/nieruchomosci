@@ -33,10 +33,6 @@ def home(request):
     return render(request, "home.html", {"inwestycje": inwestycje})
 
 
-# Lista ofert
-from django.shortcuts import render
-from django.db.models import Prefetch
-
 
 def lista_ofert(request):
     ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
@@ -70,6 +66,13 @@ def lista_ofert(request):
 
     return render(request, "oferty/lista_ofert.html", {"oferty": oferty})
 
+def szczegoly_inwestycji(request, pk):
+    inwestycja = get_object_or_404(Inwestycja, pk=pk)
+    oferty = inwestycja.oferty.all()  # używamy related_name="oferty"
+    return render(request, "oferty/szczegoly_inwestycji.html", {
+        "inwestycja": inwestycja,
+        "oferty": oferty,
+    })
 
 
 
