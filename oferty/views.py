@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db.models import Prefetch
 from .forms import OfertaForm, CenaForm
-from .models import Oferta, Cena
+from .models import Oferta, Cena, Inwestycja
 
 
 # Strona główna
