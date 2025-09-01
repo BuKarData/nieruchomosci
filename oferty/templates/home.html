@@ -28,17 +28,20 @@
     .inwestycja-box { background: #f9f9f9; }
     .inwestycja-img img { border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 
-    /* Popup */
+    /* Popup tło */
     .popup {
       display: none; /* ukryty domyślnie */
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.6);
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 2000;
     }
+
+    /* Karta popupu */
     .popup-content {
       background: #fff;
       padding: 30px;
@@ -50,6 +53,8 @@
       overflow-y: auto;
       animation: fadeIn 0.3s ease-in-out;
     }
+
+    /* Zamknięcie */
     .close {
       position: absolute;
       top: 15px; right: 20px;
@@ -59,12 +64,12 @@
       transition: color 0.2s;
     }
     .close:hover { color: #000; }
+
+    /* Animacja */
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
     }
-    .popup ul { padding-left: 0; }
-    .popup li { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
   </style>
 </head>
 
@@ -109,11 +114,11 @@
 
       <!-- Zdjęcie inwestycji po prawej -->
       <div class="inwestycja-img">
-          {% if inwestycja.zdjecie %}
+        {% if inwestycja.zdjecie %}
           <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-          {% else %}
+        {% else %}
           <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-          {% endif %}
+        {% endif %}
       </div>
     </div>
 
@@ -147,7 +152,12 @@
             <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
           {% endfor %}
         </ul>
-        
+      </div>
+    </div>
+
+    {% empty %}
+      <p>Brak inwestycji</p>
+    {% endfor %}
 
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
