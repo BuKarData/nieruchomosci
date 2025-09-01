@@ -62,73 +62,72 @@
 
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
-    {% for inwestycja in inwestycje %}
-    <div class="inwestycja-box d-flex justify-content-between align-items-center mb-4 p-3 border rounded shadow-sm">
-      
-      <!-- Opis inwestycji -->
-      <div class="inwestycja-info flex-grow-1 me-4">
-        <h4>{{ inwestycja.nazwa }}</h4>
-        <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
-        {% if inwestycja.opis %}
-          <p class="mb-3">{{ inwestycja.opis }}</p>
-        {% endif %}
-        <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
-      </div>
-    
-      <!-- Zdjęcie inwestycji po prawej -->
-      <div class="inwestycja-img">
-          {% if inwestycja.zdjecie %}
-          <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-          {% else %}
-          <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-          {% endif %}
-      </div>
-     {% endfor %} 
-    </div>
-    
+   {% for inwestycja in inwestycje %}
+<div class="inwestycja-box d-flex justify-content-between align-items-center mb-4 p-3 border rounded shadow-sm">
+  
+  <!-- Opis inwestycji -->
+  <div class="inwestycja-info flex-grow-1 me-4">
+    <h4>{{ inwestycja.nazwa }}</h4>
+    <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
+    {% if inwestycja.opis %}
+      <p class="mb-3">{{ inwestycja.opis }}</p>
+    {% endif %}
+    <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+  </div>
+
+  <!-- Zdjęcie inwestycji po prawej -->
+  <div class="inwestycja-img">
+      {% if inwestycja.zdjecie %}
+      <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
+      {% else %}
+      <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
+      {% endif %}
+  </div>
+</div>
+
 
 <!-- Popup z ofertami -->
-<div id="popup-{{ inwestycja.id }}" class="popup" style="display:none;">
+<div id="popup-{{ inwestycja.id }}" class="popup">
   <div class="popup-content shadow-lg rounded">
     <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
     <h3 class="mb-4 text-center fw-bold">Oferty w {{ inwestycja.nazwa }}</h3>
-    <div class="list-group">
+    <ul class="list-unstyled">
       {% for oferta in inwestycja.oferty.all %}
-        <div class="list-group-item py-3">
-          <h5 class="mb-1 fw-semibold">{{ oferta.adres }}</h5>
-          <p class="mb-1 text-muted">
-            {{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje
-          </p>
-          <p class="mb-0">
-            <span class="fw-bold">Status:</span> {{ oferta.status }}
-            {% if oferta.ostatnia_cena %}
-              <br><span class="fw-bold">Cena:</span> {{ oferta.ostatnia_cena }} zł
-              {% if oferta.cena_m2 %}
-                <span class="text-muted">({{ oferta.cena_m2|floatformat:0 }} zł/m²)</span>
-              {% endif %}
-            {% else %}
-              <br><span class="text-muted">Brak ceny</span>
+        <li class="mb-3 pb-3 border-bottom">
+          <strong>{{ oferta.adres }}</strong><br>
+          <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
+          <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
+          {% if oferta.ostatnia_cena %}
+            <span class="fw-semibold">Cena:</span> {{ oferta.ostatnia_cena }} zł
+            {% if oferta.cena_m2 %}
+              <span class="text-muted">({{ oferta.cena_m2|floatformat:0 }} zł/m²)</span>
             {% endif %}
-          </p>
-        </div>
+          {% else %}
+            <span class="text-muted">Brak ceny</span>
+          {% endif %}
+        </li>
       {% empty %}
-      <div class="list-group-item text-center text-muted py-3">Brak ofert dla tej inwestycji</div>
+      <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
       {% endfor %}
-    </div>
+    </ul>
   </div>
 </div>
 
 <style>
+/* Popup tło */
 .popup {
+  display: none; /* ukryty domyślnie */
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   background: rgba(0,0,0,0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 1050;
+  align-items: center;
+  z-index: 2000;
 }
+
+/* Karta popupu */
 .popup-content {
   background: #fff;
   padding: 30px;
@@ -136,33 +135,29 @@
   max-width: 700px;
   border-radius: 16px;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
   animation: fadeIn 0.3s ease-in-out;
 }
+
+/* Zamknięcie */
 .close {
   position: absolute;
   top: 15px; right: 20px;
   font-size: 28px;
-  color: #888;
+  color: #666;
   cursor: pointer;
   transition: color 0.2s;
 }
-.close:hover {
-  color: #000;
-}
+.close:hover { color: #000; }
+
+/* Animacja */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
-.list-group-item {
-  border: none;
-  border-bottom: 1px solid #eee;
-}
-.list-group-item:last-child {
-  border-bottom: none;
-}
 </style>
 
-    
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
     </div>
