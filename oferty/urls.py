@@ -1,16 +1,14 @@
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path("", views.lista_ofert, name="lista_ofert"),   # lista ofert
-    path("dodaj/", views.dodaj_oferte, name="dodaj_oferte"),  # dodawanie oferty
-    path("<int:oferta_id>/cena/", views.dodaj_cene, name="dodaj_cene"),  # ceny
-]
-
-
-
+from django.contrib import admin
+from django.urls import path, include
+from oferty import views
 from django.conf import settings
 from django.conf.urls.static import static
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("", views.home, name="home"),  # strona główna
+    path("oferty/", include("oferty.urls")),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
