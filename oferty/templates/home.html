@@ -54,47 +54,53 @@
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
     {% for inwestycja in inwestycje %}
-    <div class="inwestycja-box d-flex align-items-center mb-4 p-3 border rounded shadow-sm">
-      
-      <!-- Zdjęcie inwestycji -->
-      <div class="inwestycja-img me-4">
-        {% if inwestycja.zdjecie %}
-          <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-        {% else %}
-          <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-        {% endif %}
-      </div>
-    
-      <!-- Opis inwestycji -->
-      <div class="inwestycja-info flex-grow-1">
-        <h4>{{ inwestycja.nazwa }}</h4>
-        <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
-        <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
-      </div>
-        <div class="modal-body">
-          {% if inwestycja.oferty.all %}
-            <ul class="list-group">
-              {% for oferta in inwestycja.oferty.all %}
-              <li class="list-group-item">
-                <strong>{{ oferta.adres }}</strong> – {{ oferta.metraz }} m², {{ oferta.pokoje }} pok.
-                <span class="badge bg-secondary">{{ oferta.get_status_display }}</span>
-                <br>
-                {% if oferta.ceny.exists %}
-                  {% with ostatnia=oferta.ceny.last %}
-                    Cena: {{ ostatnia.kwota|floatformat:0 }} zł ({{ ostatnia.data }})
-                    {% if oferta.metraz %}
-                      – {{ ostatnia.kwota|div:oferta.metraz|floatformat:0 }} zł/m²
-                    {% endif %}
-                  {% endwith %}
-                {% else %}
-                  Brak ceny
-                {% endif %}
-              </li>
-              {% endfor %}
-            </ul>
+<div class="inwestycja-box d-flex align-items-center mb-4 p-3 border rounded shadow-sm">
+  
+  <!-- Zdjęcie inwestycji -->
+  <div class="inwestycja-img me-4">
+    {% if inwestycja.zdjecie %}
+      <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
+    {% else %}
+      <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
+    {% endif %}
+  </div>
+
+  <!-- Opis inwestycji -->
+  <div class="inwestycja-info flex-grow-1">
+    <h4>{{ inwestycja.nazwa }}</h4>
+    <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
+    <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+  </div>
+</div>
+
+<!-- Popup z ofertami -->
+<div id="popup-{{ inwestycja.id }}" class="popup" style="display:none;">
+  <div class="popup-content">
+    <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
+    <h3>Oferty w {{ inwestycja.nazwa }}</h3>
+    <ul>
+      {% for oferta in inwestycja.oferty.all %}
+        <li>
+          {{ oferta.adres }} - {{ oferta.metraz }} m², {{ oferta.pokoje }} pok. - Status: {{ oferta.status }}
+          {% if oferta.ostatnia_cena %}
+            - Ostatnia cena: {{ oferta.ostatnia_cena }} zł
+            {% if oferta.cena_m2 %}
+              ({{ oferta.cena_m2|floatformat:0 }} zł/m²)
+            {% endif %}
           {% else %}
-            <p>Brak ofert dla tej inwestycji.</p>
+            - Brak ceny
           {% endif %}
+        </li>
+      {% empty %}
+        <li>Brak ofert dla tej inwestycji</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% empty %}
+<p>Brak inwestycji</p>
+{% endfor %}
+
         </div>
       </div>
     </div>
