@@ -6,6 +6,10 @@ class Inwestycja(models.Model):
     adres = models.CharField(max_length=300)
     data_dodania = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.nazwa
+
+
 class Oferta(models.Model):
     STATUS_CHOICES = [
         ("dostępne", "Dostępne"),
@@ -13,15 +17,19 @@ class Oferta(models.Model):
         ("rezerwacja", "Rezerwacja"),
     ]
 
+    inwestycja = models.ForeignKey(
+        Inwestycja, related_name="oferty", on_delete=models.CASCADE
+    )
     adres = models.CharField(max_length=255)
     metraz = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     pokoje = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostępne")
     data_dodania = models.DateTimeField(auto_now_add=True)
-    zdjecie = models.ImageField(upload_to='inwestycje/', blank=True, null=True)
+    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
 
     def __str__(self):
         return f"{self.adres} ({self.metraz} m², {self.pokoje} pok.)"
+
 
 class Cena(models.Model):
     oferta = models.ForeignKey(Oferta, related_name="ceny", on_delete=models.CASCADE)
