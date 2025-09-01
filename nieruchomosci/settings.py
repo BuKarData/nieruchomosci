@@ -82,9 +82,14 @@ if not _DB_URL:
     # WOLNO użyć SQLite TYLKO lokalnie. Na produkcji to skasuj!
     _DB_URL = "sqlite:///db.sqlite3"
 
+
+
 DATABASES = {
-    "default": dj_database_url.parse(_DB_URL, conn_max_age=600, ssl_require=False)
+    "default": dj_database_url.config(
+        default=f"postgresql://postgres:eYNuwYIcdwUdrxoIPBVmaoWWCYmIFfHK@yamanote.proxy.rlwy.net:15701/railway"
+    )
 }
+
 
 # Walidatory haseł
 AUTH_PASSWORD_VALIDATORS = [
