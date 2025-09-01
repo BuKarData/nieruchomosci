@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.lista_ofert, name="lista_ofert"),
     path('dodaj/', views.dodaj_oferte, name="dodaj_oferte"),
