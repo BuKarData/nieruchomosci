@@ -124,7 +124,7 @@
         <h3 class="mb-4 text-center fw-bold">Oferty w {{ inwestycja.nazwa }}</h3>
         <ul class="list-unstyled">
           {% for oferta in inwestycja.oferty.all %}
-            <li>
+            <li class="mb-3 pb-3 border-bottom">
               <strong>{{ oferta.adres }}</strong><br>
               <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
               <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
@@ -136,16 +136,18 @@
               {% else %}
                 <span class="text-muted">Brak ceny</span>
               {% endif %}
+              <br>
+              {% if oferta.zdjecie %}
+                <img src="{{ oferta.zdjecie.url }}" alt="Zdjęcie {{ oferta.adres }}" 
+                     style="max-width:100%; max-height:250px; margin-top:10px; cursor:pointer; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);"
+                     onclick="openImage('{{ oferta.zdjecie.url }}')">
+              {% endif %}
             </li>
           {% empty %}
             <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
           {% endfor %}
         </ul>
-      </div>
-    </div>
-    {% empty %}
-    <p>Brak inwestycji</p>
-    {% endfor %}
+        
 
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
