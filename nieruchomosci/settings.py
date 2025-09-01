@@ -108,7 +108,7 @@ USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
     ('pl', 'Polski'),
-    ('en', 'English'),
+
 ]
 
 #  Pliki statyczne
