@@ -24,42 +24,6 @@
     .oferta-img { width:100%; max-width:320px; height:auto; object-fit:cover; border-radius:5px; box-shadow:0 2px 6px rgba(0,0,0,0.2); margin:0 10px; }
 
     .btn-hover-fill:hover { background-color:#0056b3; border-color:#0056b3; color:#fff; transition:0.3s; }
-
-    .inwestycja-box {
-    background: #f9f9f9;
-}
-.inwestycja-img img {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-.popup {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.popup-content {
-    background: #fff;
-    padding: 20px;
-    width: 70%;
-    max-height: 80%;
-    overflow-y: auto;
-    position: relative;
-    border-radius: 8px;
-}
-.close {
-    position: absolute;
-    top:10px; right:20px;
-    font-size: 24px;
-    cursor: pointer;
-}
-
   </style>
 </head>
 
@@ -89,51 +53,54 @@
 
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
-    {% for inwestycja in inwestycje %}
-    <div class="inwestycja-box d-flex align-items-center mb-4 p-3 border rounded shadow-sm">
-        <!-- Obrazek inwestycji -->
-        {% if inwestycja.zdjecie %}
-        <div class="inwestycja-img me-3">
-            <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="max-width:200px; object-fit:cover; height:150px;">
+{% for inwestycja in inwestycje %}
+<div class="inwestycja-box">
+  <h2>{{ inwestycja.nazwa }}</h2>
+  <p>{{ inwestycja.adres }}</p>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inwestycjaModal{{ inwestycja.id }}">
+    Szczegóły inwestycji
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="inwestycjaModal{{ inwestycja.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Oferty w {{ inwestycja.nazwa }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
         </div>
-        {% endif %}
-    
-        <!-- Informacje o inwestycji -->
-        <div class="inwestycja-info">
-            <h4>{{ inwestycja.nazwa }}</h4>
-            <p class="mb-2">{{ inwestycja.adres }}</p>
-            <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+        <div class="modal-body">
+          {% if inwestycja.oferty.all %}
+            <ul class="list-group">
+              {% for oferta in inwestycja.oferty.all %}
+              <li class="list-group-item">
+                <strong>{{ oferta.adres }}</strong> – {{ oferta.metraz }} m², {{ oferta.pokoje }} pok.
+                <span class="badge bg-secondary">{{ oferta.get_status_display }}</span>
+                <br>
+                {% if oferta.ceny.exists %}
+                  {% with ostatnia=oferta.ceny.last %}
+                    Cena: {{ ostatnia.kwota|floatformat:0 }} zł ({{ ostatnia.data }})
+                    {% if oferta.metraz %}
+                      – {{ ostatnia.kwota|div:oferta.metraz|floatformat:0 }} zł/m²
+                    {% endif %}
+                  {% endwith %}
+                {% else %}
+                  Brak ceny
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Brak ofert dla tej inwestycji.</p>
+          {% endif %}
         </div>
-    
-        <!-- Popup z ofertami -->
-        <div id="popup-{{ inwestycja.id }}" class="popup" style="display:none;">
-            <div class="popup-content">
-                <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
-                <h3>Oferty w {{ inwestycja.nazwa }}</h3>
-                <ul>
-                {% for oferta in inwestycja.oferty.all %}
-                    <li>
-                        {{ oferta.adres }} - {{ oferta.metraz }} m², {{ oferta.pokoje }} pok. - Status: {{ oferta.status }}
-                        {% if oferta.ostatnia_cena %}
-                            - Ostatnia cena: {{ oferta.ostatnia_cena }} zł
-                            {% if oferta.cena_m2 %}
-                                ({{ oferta.cena_m2|floatformat:0 }} zł/m²)
-                            {% endif %}
-                        {% else %}
-                            - Brak ceny
-                        {% endif %}
-                    </li>
-                {% empty %}
-                    <li>Brak ofert</li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
+      </div>
     </div>
-    {% empty %}
-    <p>Brak inwestycji</p>
-    {% endfor %}
-    
+  </div>
+</div>
+{% empty %}
+<p>Brak inwestycji</p>
+{% endfor %}
 
     
     <script>
