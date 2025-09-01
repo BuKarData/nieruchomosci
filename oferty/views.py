@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.db.models import Prefetch
-from .models import Oferta, Cena
 from .forms import OfertaForm, CenaForm
 
 
@@ -36,7 +35,6 @@ def home(request):
 # Lista ofert
 from django.shortcuts import render
 from django.db.models import Prefetch
-from .models import Oferta, Cena
 
 
 def lista_ofert(request):
