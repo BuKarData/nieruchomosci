@@ -71,7 +71,6 @@
         <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
         <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
       </div>
-    </div>
         <div class="modal-body">
           {% if inwestycja.oferty.all %}
             <ul class="list-group">
