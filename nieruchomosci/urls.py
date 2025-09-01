@@ -19,12 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from oferty import views
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", views.home, name="home"),  # strona główna
-    path("oferty/", include("oferty.urls")),  # reszta ścieżek aplikacji
-]
+urlpatterns = i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('', include('oferty.urls')),
+)
+
 
 
 
