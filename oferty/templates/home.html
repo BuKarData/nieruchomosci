@@ -53,22 +53,25 @@
 
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
-{% for inwestycja in inwestycje %}
-<div class="inwestycja-box">
-  <h2>{{ inwestycja.nazwa }}</h2>
-  <p>{{ inwestycja.adres }}</p>
-  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inwestycjaModal{{ inwestycja.id }}">
-    Szczegóły inwestycji
-  </button>
-
-  <!-- Modal -->
-  <div class="modal fade" id="inwestycjaModal{{ inwestycja.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Oferty w {{ inwestycja.nazwa }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
-        </div>
+    {% for inwestycja in inwestycje %}
+    <div class="inwestycja-box d-flex align-items-center mb-4 p-3 border rounded shadow-sm">
+      
+      <!-- Zdjęcie inwestycji -->
+      <div class="inwestycja-img me-4">
+        {% if inwestycja.zdjecie %}
+          <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
+        {% else %}
+          <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
+        {% endif %}
+      </div>
+    
+      <!-- Opis inwestycji -->
+      <div class="inwestycja-info flex-grow-1">
+        <h4>{{ inwestycja.nazwa }}</h4>
+        <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
+        <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+      </div>
+    </div>
         <div class="modal-body">
           {% if inwestycja.oferty.all %}
             <ul class="list-group">
