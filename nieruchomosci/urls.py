@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", include("oferty.urls")),  # <- podłączamy aplikację
+    path('', views.lista_ofert, name="lista_ofert"),
+    path('dodaj/', views.dodaj_oferte, name="dodaj_oferte"),
+    path('<int:oferta_id>/cena/', views.dodaj_cene, name="dodaj_cene"),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
