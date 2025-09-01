@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("inwestycja/<int:pk>/", views.szczegoly_inwestycji, name="szczegoly_inwestycji"),
+    path('admin/', admin.site.urls),
+    path('', views.home, name="home"),  # <-- główna strona
+    path('oferty/', include('oferty.urls')),  # dodatkowe ścieżki
 ]
 
 from django.conf import settings
