@@ -63,24 +63,28 @@
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
     {% for inwestycja in inwestycje %}
-<div class="inwestycja-box d-flex align-items-center mb-4 p-3 border rounded shadow-sm">
-  
-  <!-- Zdjęcie inwestycji -->
-  <div class="inwestycja-img me-4">
-      {% if inwestycja.zdjecie %}
-      <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-      {% else %}
-      <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:220px; height:160px; object-fit:cover;">
-      {% endif %}
-  </div>
-
-  <!-- Opis inwestycji -->
-  <div class="inwestycja-info flex-grow-1">
-    <h4>{{ inwestycja.nazwa }}</h4>
-    <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
-    <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
-  </div>
-</div>
+    <div class="inwestycja-box d-flex justify-content-between align-items-center mb-4 p-3 border rounded shadow-sm">
+      
+      <!-- Opis inwestycji -->
+      <div class="inwestycja-info flex-grow-1 me-4">
+        <h4>{{ inwestycja.nazwa }}</h4>
+        <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
+        {% if inwestycja.opis %}
+          <p class="mb-3">{{ inwestycja.opis }}</p>
+        {% endif %}
+        <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+      </div>
+    
+      <!-- Zdjęcie inwestycji po prawej -->
+      <div class="inwestycja-img">
+          {% if inwestycja.zdjecie %}
+          <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
+          {% else %}
+          <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
+          {% endif %}
+      </div>
+    </div>
+    
 
 <!-- Popup z ofertami -->
 <div id="popup-{{ inwestycja.id }}" class="popup" style="display:none;">
