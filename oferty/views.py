@@ -20,7 +20,7 @@ def home(request):
 
     # Przygotowanie danych dla każdej oferty
     for inwestycja in inwestycje:
-        for oferta in inwestycja.oferta_set.all():
+        for oferta in inwestycja.oferty.all():
             ceny = list(oferta.ceny.all())
             if ceny:
                 ostatnia = ceny[-1]
