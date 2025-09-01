@@ -15,7 +15,7 @@ def home(request):
     ceny_prefetch = Prefetch('ceny', queryset=Cena.objects.order_by('data'))
     
     inwestycje = Inwestycja.objects.prefetch_related(
-        Prefetch('oferta_set', queryset=Oferta.objects.prefetch_related(ceny_prefetch))
+        Prefetch('oferty', queryset=Oferta.objects.prefetch_related(ceny_prefetch))
     ).order_by('-data_dodania')
 
     # Przygotowanie danych dla każdej oferty
