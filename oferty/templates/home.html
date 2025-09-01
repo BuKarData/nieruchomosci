@@ -96,7 +96,7 @@
             {% if oferta.cena_m2 %}
               ({{ oferta.cena_m2|floatformat:0 }} zł/m²)
             {% endif %}
-          {% empty %}
+          {% else %}
             - Brak ceny
           {% endif %}
         </li>
