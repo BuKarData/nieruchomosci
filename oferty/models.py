@@ -5,6 +5,7 @@ class Inwestycja(models.Model):
     nazwa = models.CharField(max_length=200)
     adres = models.CharField(max_length=300)
     data_dodania = models.DateTimeField(auto_now_add=True)
+    zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
 
     def __str__(self):
         return self.nazwa
