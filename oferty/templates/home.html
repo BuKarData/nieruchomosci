@@ -25,14 +25,47 @@
 
     .btn-hover-fill:hover { background-color:#0056b3; border-color:#0056b3; color:#fff; transition:0.3s; }
 
-    .inwestycja-box {
-  background: #f9f9f9;
-}
-.inwestycja-img img {
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
+    .inwestycja-box { background: #f9f9f9; }
+    .inwestycja-img img { border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 
+    /* Popup */
+    .popup {
+      display: none; /* ukryty domyślnie */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .popup-content {
+      background: #fff;
+      padding: 30px;
+      width: 80%;
+      max-width: 700px;
+      border-radius: 16px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .close {
+      position: absolute;
+      top: 15px; right: 20px;
+      font-size: 28px;
+      color: #666;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close:hover { color: #000; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .popup ul { padding-left: 0; }
+    .popup li { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
   </style>
 </head>
 
@@ -62,101 +95,58 @@
 
     <h1 class="text-center mb-4">Nasze inwestycje</h1>
 
-   {% for inwestycja in inwestycje %}
-<div class="inwestycja-box d-flex justify-content-between align-items-center mb-4 p-3 border rounded shadow-sm">
-  
-  <!-- Opis inwestycji -->
-  <div class="inwestycja-info flex-grow-1 me-4">
-    <h4>{{ inwestycja.nazwa }}</h4>
-    <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
-    {% if inwestycja.opis %}
-      <p class="mb-3">{{ inwestycja.opis }}</p>
-    {% endif %}
-    <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
-  </div>
+    {% for inwestycja in inwestycje %}
+    <div class="inwestycja-box d-flex justify-content-between align-items-center mb-4 p-3 border rounded shadow-sm">
+      
+      <!-- Opis inwestycji -->
+      <div class="inwestycja-info flex-grow-1 me-4">
+        <h4>{{ inwestycja.nazwa }}</h4>
+        <p class="mb-2 text-muted">{{ inwestycja.adres }}</p>
+        {% if inwestycja.opis %}
+          <p class="mb-3">{{ inwestycja.opis }}</p>
+        {% endif %}
+        <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+      </div>
 
-  <!-- Zdjęcie inwestycji po prawej -->
-  <div class="inwestycja-img">
-      {% if inwestycja.zdjecie %}
-      <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-      {% else %}
-      <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
-      {% endif %}
-  </div>
-</div>
-
-
-<!-- Popup z ofertami -->
-<div id="popup-{{ inwestycja.id }}" class="popup">
-  <div class="popup-content shadow-lg rounded">
-    <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
-    <h3 class="mb-4 text-center fw-bold">Oferty w {{ inwestycja.nazwa }}</h3>
-    <ul class="list-unstyled">
-      {% for oferta in inwestycja.oferty.all %}
-        <li class="mb-3 pb-3 border-bottom">
-          <strong>{{ oferta.adres }}</strong><br>
-          <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
-          <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
-          {% if oferta.ostatnia_cena %}
-            <span class="fw-semibold">Cena:</span> {{ oferta.ostatnia_cena }} zł
-            {% if oferta.cena_m2 %}
-              <span class="text-muted">({{ oferta.cena_m2|floatformat:0 }} zł/m²)</span>
-            {% endif %}
+      <!-- Zdjęcie inwestycji po prawej -->
+      <div class="inwestycja-img">
+          {% if inwestycja.zdjecie %}
+          <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
           {% else %}
-            <span class="text-muted">Brak ceny</span>
+          <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia" class="img-fluid rounded" style="width:400px; height:280px; object-fit:cover;">
           {% endif %}
-        </li>
-      {% empty %}
-      <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
+      </div>
+    </div>
 
-<style>
-/* Popup tło */
-.popup {
-  display: none; /* ukryty domyślnie */
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-/* Karta popupu */
-.popup-content {
-  background: #fff;
-  padding: 30px;
-  width: 80%;
-  max-width: 700px;
-  border-radius: 16px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Zamknięcie */
-.close {
-  position: absolute;
-  top: 15px; right: 20px;
-  font-size: 28px;
-  color: #666;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.close:hover { color: #000; }
-
-/* Animacja */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-</style>
+    <!-- Popup z ofertami -->
+    <div id="popup-{{ inwestycja.id }}" class="popup">
+      <div class="popup-content shadow-lg rounded">
+        <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
+        <h3 class="mb-4 text-center fw-bold">Oferty w {{ inwestycja.nazwa }}</h3>
+        <ul class="list-unstyled">
+          {% for oferta in inwestycja.oferty.all %}
+            <li>
+              <strong>{{ oferta.adres }}</strong><br>
+              <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
+              <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
+              {% if oferta.ostatnia_cena %}
+                <span class="fw-semibold">Cena:</span> {{ oferta.ostatnia_cena }} zł
+                {% if oferta.cena_m2 %}
+                  <span class="text-muted">({{ oferta.cena_m2|floatformat:0 }} zł/m²)</span>
+                {% endif %}
+              {% else %}
+                <span class="text-muted">Brak ceny</span>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% empty %}
+    <p>Brak inwestycji</p>
+    {% endfor %}
 
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
@@ -183,6 +173,15 @@
       tel: +48 696 362 748<br>
       email: beatazochowska8@gmail.com
     </div>
+
+    <script>
+      function showPopup(id){
+          document.getElementById(id).style.display = 'flex';
+      }
+      function hidePopup(id){
+          document.getElementById(id).style.display = 'none';
+      }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
