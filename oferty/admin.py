@@ -1,6 +1,32 @@
 from django.contrib import admin
-from .models import Oferta, Cena, Inwestycja, InwestycjaZdjecie
+from .models import (
+    Oferta,
+    Cena,
+    Inwestycja,
+    InwestycjaZdjecie,
+    RodzajLokalu,
+    PomieszczeniePrzynalezne,
+    SwiadczeniePieniezne,
+    Rabat
+)
 
+@admin.register(RodzajLokalu)
+class RodzajLokaluAdmin(admin.ModelAdmin):
+    list_display = ("nazwa",)
+    search_fields = ("nazwa",)
+
+
+class PomieszczeniePrzynalezneInline(admin.TabularInline):
+    model = PomieszczeniePrzynalezne
+    extra = 1
+
+class SwiadczeniePieniezneInline(admin.TabularInline):
+    model = SwiadczeniePieniezne
+    extra = 1
+
+class RabatInline(admin.TabularInline):
+    model = Rabat
+    extra = 1
 
 
 class InwestycjaZdjecieInline(admin.TabularInline):
@@ -8,15 +34,32 @@ class InwestycjaZdjecieInline(admin.TabularInline):
     extra = 1
 
     def inwestycja_nazwa(self, obj):
-        # This method safely returns the name of the related investment.
-        # It won't crash even if 'obj.inwestycja' is None.
         return obj.inwestycja.nazwa if obj.inwestycja else "Brak inwestycji"
 
 @admin.register(Inwestycja)
 class InwestycjaAdmin(admin.ModelAdmin):
-    inlines = [InwestycjaZdjecieInline]
-    list_display = ("nazwa", "adres", "data_dodania")
-    search_fields = ("nazwa", "adres")
+      inlines = [InwestycjaZdjecieInline]
+      list_display = (
+        "nazwa",
+        "adres",
+        "data_dodania",
+        "unikalny_identyfikator_przedsiewziecia",
+        "numer_pozwolenia"
+    )
+      search_fields = ("nazwa", "adres")
+    # Dodanie nowych pól do formularza inwestycji
+      fields = (
+        "nazwa",
+        "adres",
+        "opis",
+        "standard",
+        "zdjecie",
+        "unikalny_identyfikator_przedsiewziecia",
+        "numer_pozwolenia",
+        "termin_rozpoczecia",
+        "termin_zakonczenia"
+    )
+
 
 @admin.register(InwestycjaZdjecie)
 class InwestycjaZdjecieAdmin(admin.ModelAdmin):
@@ -30,9 +73,40 @@ class InwestycjaZdjecieAdmin(admin.ModelAdmin):
 
 @admin.register(Oferta)
 class OfertaAdmin(admin.ModelAdmin):
-    list_display = ("adres", "metraz", "pokoje", "status", "data_dodania")
-    list_filter = ("status",)
-    search_fields = ("adres",)
+    inlines = [
+        PomieszczeniePrzynalezneInline,
+        SwiadczeniePieniezneInline,
+        RabatInline,
+    ]
+    list_display = (
+        "numer_lokalu",
+        "numer_oferty",
+        "metraz",
+        "pokoje",
+        "status",
+        "rodzaj_lokalu",
+        "data_dodania"
+    )
+    list_filter = ("status", "rodzaj_lokalu")
+    search_fields = ("numer_lokalu", "numer_oferty")
+    # Zmieniamy pola w formularzu, aby umożliwić edycję wszystkich atrybutów
+    fieldsets = (
+        ("Informacje podstawowe", {
+            "fields": (
+                "inwestycja",
+                "numer_lokalu",
+                "numer_oferty",
+                "rodzaj_lokalu",
+                "metraz",
+                "pokoje",
+                "status",
+                "zdjecie"
+            )
+        }),
+        ("Szczegóły", {
+            "fields": ("adres",)
+        }),
+    )
 
 
 @admin.register(Cena)
