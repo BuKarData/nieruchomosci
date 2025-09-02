@@ -63,7 +63,8 @@ class InwestycjaZdjecie(models.Model):
     def __str__(self):
         if self.inwestycja:
             return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
-        return f"Zdjęcie {self.id}"
+        else:
+            return f"Zdjęcie {self.id} - brak inwestycji"
     
     class RodzajLokalu(models.Model):
         nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
