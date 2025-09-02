@@ -19,9 +19,9 @@ class Command(BaseCommand):
             os.makedirs(raporty_dir)
 
         data_raportu = str(date.today())
-        nazwa_pliku = f"{raporty_dir}/Raport ofert firmy BZ-Bud.csv"
+        # Zmieniona nazwa pliku z dodaną dynamiczną datą
+        nazwa_pliku = f"{raporty_dir}/Raport ofert firmy BZ-Bud_{data_raportu}.csv"
 
-        # Zmiana kodowania na 'utf-8-sig', co dodaje BOM i zapewnia poprawną obsługę polskich znaków w Excelu
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
             # Ujednolicona lista nagłówków kolumn
             fieldnames = [
