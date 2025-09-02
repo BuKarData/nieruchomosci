@@ -56,15 +56,14 @@ class Cena(models.Model):
     def __str__(self):
         return f"{self.kwota} zł ({self.data})"
 
+
 class InwestycjaZdjecie(models.Model):
     inwestycja = models.ForeignKey(Inwestycja, related_name="zdjecia", on_delete=models.CASCADE)
     obraz = models.ImageField(upload_to="inwestycje/galeria/")
 
     def __str__(self):
-        if self.inwestycja:
-            return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
-        else:
-            return f"Zdjęcie {self.id} - brak inwestycji"
+        # A simple, safe representation.
+        return f"Zdjęcie {self.id}"
     
     class RodzajLokalu(models.Model):
         nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
