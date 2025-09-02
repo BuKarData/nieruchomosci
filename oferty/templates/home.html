@@ -188,17 +188,20 @@
             {% for oferta in inwestycja.oferty.all %}
               <li class="mb-3 pb-3 border-bottom">
                 <strong>{{ oferta.adres }}</strong><br>
-                <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
-                <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
-                {% if oferta.ostatnia_cena %}
-                  <span class="fw-semibold">Cena:</span> {{ oferta.ostatnia_cena }} zł
-                  {% if oferta.cena_m2 %}
-                    <span class="text-muted">({{ oferta.cena_m2|floatformat:0 }} zł/m²)</span>
-                  {% endif %}
-                {% else %}
-                  <span class="text-muted">Brak ceny</span>
-                {% endif %}
-              </li>
+                 <span class="text-muted">{{ oferta.metraz }} m² • {{ oferta.pokoje }} pokoje</span><br>
+                 <span class="fw-semibold">Status:</span> {{ oferta.status }}<br>
+                 {% if oferta.ostatnia_cena %}
+                     <span class="fw-semibold">Cena:</span> {{ oferta.ostatnia_cena }} zł
+                      {% if oferta.cena_m2 %} (<span class="text-muted">{{ oferta.cena_m2|floatformat:0 }} zł/m²</span>) {% endif %}
+                 {% else %}
+                     <span class="text-muted">Brak ceny</span>
+                 {% endif %}
+
+                 {% if oferta.zdjecie %}
+                    <div class="mt-2">
+                   <button class="btn btn-outline-primary btn-sm" onclick="openRzutModal('{{ oferta.zdjecie.url }}')">Zobacz rzut</button>
+                    </div>
+                 {% endif %}
             {% empty %}
               <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
             {% endfor %}
