@@ -37,8 +37,9 @@
     }
     .inwestycja-img img:hover { transform: scale(1.02); }
 
+    /* Popup inwestycji */
     .popup {
-      display: none;
+      display: none; /* ukryty domyślnie */
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
@@ -71,11 +72,12 @@
       transition: color 0.2s;
     }
     .close:hover { color: #000; }
+
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-    /* Modal dla powiększonego zdjęcia */
+    /* Modal powiększenia zdjęcia */
     .image-modal {
-      display: none;
+      display: none; /* ukryty domyślnie */
       position: fixed;
       z-index: 3000;
       left: 0; top: 0;
@@ -83,8 +85,8 @@
       background-color: rgba(0,0,0,0.9);
       justify-content: center;
       align-items: center;
-      animation: fadeIn 0.3s ease-in-out;
     }
+    .image-modal.show { display: flex; }
     .image-modal img {
       max-width: 90%;
       max-height: 90%;
@@ -178,8 +180,8 @@
       <p>Brak inwestycji</p>
     {% endfor %}
 
-    <!-- Modal na powiększone zdjęcie -->
-    <div id="imageModal" class="image-modal d-flex">
+    <!-- Modal powiększonego zdjęcia -->
+    <div id="imageModal" class="image-modal">
       <span class="close-modal" onclick="closeImageModal()">&times;</span>
       <img id="modalImage" src="" alt="Zdjęcie powiększone">
     </div>
@@ -208,12 +210,15 @@
     </div>
 
   <script>
+    // Funkcje popupów inwestycji
     function showPopup(id){
       document.getElementById(id).style.display = 'flex';
     }
     function hidePopup(id){
       document.getElementById(id).style.display = 'none';
     }
+
+    // Funkcje powiększenia zdjęcia
     function openImageModal(src){
       const modal = document.getElementById('imageModal');
       const img = document.getElementById('modalImage');
@@ -232,3 +237,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
+
