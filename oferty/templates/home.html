@@ -284,12 +284,10 @@
             {% endfor %}
 
             {% if inwestycja.standard %}
-            <div class="inwestycja-standard">
-            <h5>Standard wykończenia budynku</h5>
-            <p>{{ inwestycja.standard }}</p>
-            </div>
-            {% else %}
-             <span class="text-muted">Brak informacji</span>
+              <div class="inwestycja-standard">
+              <h5>Standard wykończenia budynku</h5>
+              <p>{{ inwestycja.standard|linebreaksbr }}</p>
+              </div>
             {% endif %}
           </ul>
         </div>
