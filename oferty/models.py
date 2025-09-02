@@ -46,3 +46,10 @@ class Cena(models.Model):
 
     def __str__(self):
         return f"{self.kwota} zł ({self.data})"
+
+class InwestycjaZdjecie(models.Model):
+    inwestycja = models.ForeignKey(Inwestycja, related_name="zdjecia", on_delete=models.CASCADE)
+    obraz = models.ImageField(upload_to="inwestycje/galeria/")
+
+    def __str__(self):
+        return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
