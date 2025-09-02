@@ -169,9 +169,9 @@
 .gallery-arrow.left { left: -20px; }
 .gallery-arrow.right { right: -20px; }
 
-.inwestycja-opis {
+.inwestycja-standard {
   background: #f8f8f8;
-  border-left: 4px solid #0056b3; /* subtelny akcent */
+  border-left: 4px solid #0056b3;
   padding: 16px;
   border-radius: 8px;
   margin-top: 20px;
@@ -180,7 +180,7 @@
   line-height: 1.5;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.inwestycja-opis h5 {
+.inwestycja-standard h5 {
   margin-bottom: 8px;
   font-weight: 600;
   color: #222;
@@ -290,10 +290,10 @@
 </div>
 
 <!-- Po liście ofert w popupie -->
-{% if inwestycja.opis %}
-<div class="inwestycja-opis">
+{% if inwestycja.standard %}
+<div class="inwestycja-standard">
   <h5>Standard wykończenia budynku</h5>
-  <p>{{ inwestycja.opis }}</p>
+  <p>{{ inwestycja.standard }}</p>
 </div>
 {% endif %}
 

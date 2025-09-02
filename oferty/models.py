@@ -7,6 +7,7 @@ class Inwestycja(models.Model):
     data_dodania = models.DateTimeField(auto_now_add=True)
     zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
     opis = models.TextField(blank=True, null=True)
+    standard = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.nazwa
 
