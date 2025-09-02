@@ -2,21 +2,10 @@ from django.contrib import admin
 from .models import Oferta, Cena, Inwestycja, InwestycjaZdjecie
 
 
-@admin.register(InwestycjaZdjecie)
-class InwestycjaZdjecieAdmin(admin.ModelAdmin):
-    list_display = ('obraz', 'inwestycja_nazwa')
-
-    def inwestycja_nazwa(self, obj):
-        return obj.inwestycja.nazwa if obj.inwestycja else "Brak inwestycji"
-    
-    inwestycja_nazwa.short_description = "Inwestycja"
-
 
 class InwestycjaZdjecieInline(admin.TabularInline):
     model = InwestycjaZdjecie
     extra = 1
-    fields = ('obraz', 'inwestycja_nazwa')
-    readonly_fields = ('inwestycja_nazwa',)
 
     def inwestycja_nazwa(self, obj):
         # This method safely returns the name of the related investment.
@@ -28,6 +17,15 @@ class InwestycjaAdmin(admin.ModelAdmin):
     inlines = [InwestycjaZdjecieInline]
     list_display = ("nazwa", "adres", "data_dodania")
     search_fields = ("nazwa", "adres")
+
+@admin.register(InwestycjaZdjecie)
+class InwestycjaZdjecieAdmin(admin.ModelAdmin):
+    list_display = ('obraz', 'inwestycja_nazwa')
+
+    def inwestycja_nazwa(self, obj):
+        return obj.inwestycja.nazwa if obj.inwestycja else "Brak inwestycji"
+    
+    inwestycja_nazwa.short_description = "Inwestycja"
 
 
 @admin.register(Oferta)
