@@ -283,19 +283,21 @@
       <p>Brak inwestycji</p>
     {% endfor %}
 
+    <!-- Po liście ofert w popupie -->
+    {% if inwestycja.standard %}
+      <div class="inwestycja-standard">
+      <h5>Standard wykończenia budynku</h5>
+      <p>{{ inwestycja.standard }}</p>
+      </div>
+    {% endif %}
+
 <!-- Modal na rzut oferty -->
 <div id="rzutModal" class="image-modal">
   <span class="close-modal" onclick="closeRzutModal()">&times;</span>
   <img id="rzutImage" src="" alt="Rzut oferty">
 </div>
 
-<!-- Po liście ofert w popupie -->
-{% if inwestycja.standard %}
-<div class="inwestycja-standard">
-  <h5>Standard wykończenia budynku</h5>
-  <p>{{ inwestycja.standard }}</p>
-</div>
-{% endif %}
+
 
 
 
