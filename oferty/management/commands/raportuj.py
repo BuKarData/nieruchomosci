@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Raport CSV został pomyślnie wygenerowany: {nazwa_pliku}"))
 
-    ---
+
 
     def generate_jsonld_report(self, dane_dewelopera, oferty):
         """
@@ -146,7 +146,6 @@ class Command(BaseCommand):
             
         self.stdout.write(self.style.SUCCESS(f"Raport JSON-LD został pomyślnie wygenerowany: {nazwa_pliku}"))
 
-    ---
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Rozpoczynanie generowania raportów...")

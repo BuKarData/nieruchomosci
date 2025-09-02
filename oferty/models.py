@@ -61,7 +61,9 @@ class InwestycjaZdjecie(models.Model):
     obraz = models.ImageField(upload_to="inwestycje/galeria/")
 
     def __str__(self):
-        return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
+        if self.inwestycja:
+            return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
+        return f"Zdjęcie {self.id}"
     
     class RodzajLokalu(models.Model):
         nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
