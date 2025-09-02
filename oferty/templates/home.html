@@ -335,6 +335,12 @@ function closeRzutModal(){
   modal.classList.remove('show');
   setTimeout(() => modal.style.display = 'none', 300);
 }
+function scrollGallery(button, direction) {
+  const container = button.parentElement.querySelector('.gallery-wrapper');
+  const scrollAmount = container.querySelector('.gallery-thumb').offsetWidth + 12; // szerokość + odstęp
+  container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+}
+
 
   </script>
 
