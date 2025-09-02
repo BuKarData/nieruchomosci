@@ -1,3 +1,5 @@
+# /twoj_projekt/nazwa_aplikacji/management/commands/raportuj.py
+
 from django.core.management.base import BaseCommand
 from oferty.models import Oferta
 import requests
@@ -21,7 +23,6 @@ class Command(BaseCommand):
         nazwa_pliku = f"{raporty_dir}/raport_{data_raportu}.csv"
 
         with open(nazwa_pliku, "w", newline="", encoding="utf-8") as csvfile:
-            # Nagłówki kolumn w pliku CSV
             fieldnames = [
                 "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
                 "id_oferty", "adres_inwestycji", "numer_lokalu", "numer_oferty",
@@ -43,7 +44,7 @@ class Command(BaseCommand):
                     "adres_biura": dane_dewelopera["adres_biura"],
                     "data_raportu": data_raportu,
                     "id_oferty": oferta.id,
-                    "adres_inwestycji": oferta.adres_inwestycji if hasattr(oferta, 'adres_inwestycji') else "",
+                    "adres_inwestycji": oferta.inwestycja.adres if oferta.inwestycja else "",
                     "numer_lokalu": oferta.numer_lokalu,
                     "numer_oferty": oferta.numer_oferty if hasattr(oferta, 'numer_oferty') else "",
                     "metraz": float(oferta.metraz) if oferta.metraz else "",
@@ -52,9 +53,9 @@ class Command(BaseCommand):
                     "cena": float(ostatnia_cena.kwota) if ostatnia_cena else "",
                     "cena_za_m2": cena_m2,
                     "data_ceny": ostatnia_cena.data.isoformat() if ostatnia_cena else "",
-                    "pomieszczenia_przynaleznie": oferta.pomieszczenia_przynaleznie if hasattr(oferta, 'pomieszczenia_przynaleznie') else "",
-                    "rabaty_i_promocje": oferta.rabaty_i_promocje if hasattr(oferta, 'rabaty_i_promocje') else "",
-                    "inne_swiadczenia": oferta.inne_swiadczenia if hasattr(oferta, 'inne_swiadczenia') else ""
+                    "pomieszczenia_przynaleznie": ", ".join([p.nazwa for p in oferta.pomieszczenia_przynalezne.all()]),
+                    "rabaty_i_promocje": ", ".join([r.nazwa for r in oferta.rabaty.all()]),
+                    "inne_swiadczenia": ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
                 }
                 writer.writerow(rekord_csv)
 
@@ -88,6 +89,11 @@ class Command(BaseCommand):
             ceny_list = list(oferta.ceny.all())
             ostatnia_cena = ceny_list[-1] if ceny_list else None
             cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else None
+            
+            # Pobieranie powiązanych danych
+            pomieszczenia_przynalezne = [{"nazwa": p.nazwa, "cena": float(p.cena)} for p in oferta.pomieszczenia_przynalezne.all()]
+            rabaty = [{"nazwa": r.nazwa, "wartosc": float(r.wartosc), "typ": r.typ} for r in oferta.rabaty.all()]
+            inne_swiadczenia = [{"nazwa": s.nazwa, "kwota": float(s.kwota)} for s in oferta.inne_swiadczenia.all()]
 
             rekord_jsonld = {
                 "@context": jsonld_context,
@@ -104,7 +110,7 @@ class Command(BaseCommand):
                     "@type": "Apartment",
                     "address": {
                         "@type": "PostalAddress",
-                        "streetAddress": oferta.adres_inwestycji if hasattr(oferta, 'adres_inwestycji') else "",
+                        "streetAddress": oferta.inwestycja.adres if oferta.inwestycja else "",
                         "addressLocality": "Zielonka",
                     },
                     "numberOfRooms": oferta.pokoje,
@@ -127,9 +133,9 @@ class Command(BaseCommand):
                 },
                 "data_raportu": data_raportu,
                 "cena_za_m2": cena_m2,
-                "pomieszczenia_przynaleznie": oferta.pomieszczenia_przynaleznie if hasattr(oferta, 'pomieszczenia_przynaleznie') else None,
-                "rabaty_i_promocje": oferta.rabaty_i_promocje if hasattr(oferta, 'rabaty_i_promocje') else None,
-                "inne_swiadczenia": oferta.inne_swiadczenia if hasattr(oferta, 'inne_swiadczenia') else None
+                "pomieszczenia_przynaleznie": pomieszczenia_przynalezne,
+                "rabaty": rabaty,
+                "inne_swiadczenia": inne_swiadczenia,
             }
             raport_lines.append(json.dumps(rekord_jsonld, ensure_ascii=False))
 
@@ -152,7 +158,7 @@ class Command(BaseCommand):
             "adres_biura": "woj. MAZOWIECKIE, pow. wołomiński, gm. Zielonka, miejsc. Zielonka, ul. Ignacego Paderewskiego, nr 61, 05-220"
         }
 
-        oferty = Oferta.objects.prefetch_related("ceny").all()
+        oferty = Oferta.objects.prefetch_related("ceny", "inwestycja", "pomieszczenia_przynalezne", "rabaty", "inne_swiadczenia").all()
         
         if not oferty.exists():
             self.stdout.write(self.style.WARNING("Nie znaleziono żadnych ofert do zaraportowania."))
@@ -161,35 +167,61 @@ class Command(BaseCommand):
         self.generate_csv_report(dane_dewelopera, oferty)
         self.generate_jsonld_report(dane_dewelopera, oferty)
         
-        # Sekcja wysyłki JSONL do API
+        # Sekcja wysyłki JSONL do API - Ustrukturyzowanie i walidacja
         raport_lines = []
         data_raportu = str(date.today())
 
         for oferta in oferty:
+            # Walidacja danych przed dodaniem do raportu
+            if not oferta.inwestycja or not oferta.inwestycja.unikalny_identyfikator_przedsiewziecia:
+                self.stdout.write(self.style.ERROR(f"Błąd walidacji: Oferta o ID {oferta.id} nie ma powiązanej inwestycji lub unikalnego identyfikatora."))
+                continue
+
             ceny_list = list(oferta.ceny.all())
             ostatnia_cena = ceny_list[-1] if ceny_list else None
+            
+            if not ostatnia_cena:
+                self.stdout.write(self.style.WARNING(f"Ostrzeżenie: Oferta o ID {oferta.id} nie ma zdefiniowanej ceny. Pomijam w raporcie JSONL."))
+                continue
+
             cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else None
 
+            # Spłaszczanie danych do pojedynczego rekordu JSON
             rekord_oferty = {
-                **dane_dewelopera,
-                "data_raportu": data_raportu,
+                "deweloper": {
+                    "nip": dane_dewelopera["nip"],
+                    "regon": dane_dewelopera["regon"],
+                    "nazwa_firmy": dane_dewelopera["nazwa_firmy"],
+                },
+                "inwestycja": {
+                    "unikalny_identyfikator": oferta.inwestycja.unikalny_identyfikator_przedsiewziecia,
+                    "numer_pozwolenia_na_budowe": oferta.inwestycja.numer_pozwolenia,
+                    "termin_rozpoczecia": oferta.inwestycja.termin_rozpoczecia.isoformat() if oferta.inwestycja.termin_rozpoczecia else None,
+                    "termin_zakonczenia": oferta.inwestycja.termin_zakonczenia.isoformat() if oferta.inwestycja.termin_zakonczenia else None,
+                },
                 "oferta": {
                     "id": oferta.id,
-                    "adres": oferta.adres,
                     "numer_lokalu": oferta.numer_lokalu,
                     "numer_oferty": oferta.numer_oferty if hasattr(oferta, 'numer_oferty') else None,
+                    "rodzaj_lokalu": oferta.rodzaj_lokalu.nazwa if oferta.rodzaj_lokalu else None,
                     "metraz": float(oferta.metraz) if oferta.metraz else None,
                     "pokoje": oferta.pokoje,
                     "status": oferta.status,
                     "cena": float(ostatnia_cena.kwota) if ostatnia_cena else None,
                     "cena_za_m2": cena_m2,
-                    "data_ceny": ostatnia_cena.data.isoformat() if ostatnia_cena else None,
-                    "pomieszczenia_przynaleznie": oferta.pomieszczenia_przynaleznie if hasattr(oferta, 'pomieszczenia_przynaleznie') else None,
-                    "rabaty_i_promocje": oferta.rabaty_i_promocje if hasattr(oferta, 'rabaty_i_promocje') else None,
-                    "inne_swiadczenia": oferta.inne_swiadczenia if hasattr(oferta, 'inne_swiadczenia') else None
+                    "data_ceny": ostatnia_cena.data.isoformat() if ostatnia_cena else None
+                },
+                "dodatkowe_oplaty": {
+                    "pomieszczenia_przynaleznie": [{"nazwa": p.nazwa, "cena": float(p.cena)} for p in oferta.pomieszczenia_przynalezne.all()],
+                    "rabaty_i_promocje": [{"nazwa": r.nazwa, "wartosc": float(r.wartosc), "typ": r.typ, "data_od": r.data_od.isoformat(), "data_do": r.data_do.isoformat()} for r in oferta.rabaty.all()],
+                    "inne_swiadczenia": [{"nazwa": s.nazwa, "kwota": float(s.kwota)} for s in oferta.inne_swiadczenia.all()]
                 }
             }
             raport_lines.append(json.dumps(rekord_oferty))
+
+        if not raport_lines:
+            self.stdout.write(self.style.WARNING("Brak poprawnych ofert do wysłania."))
+            return
 
         payload = "\n".join(raport_lines)
         headers = {"Content-Type": "application/x-json-stream"}
