@@ -6,13 +6,14 @@ from datetime import date
 import csv
 import os
 
+
 class Command(BaseCommand):
     help = "Generuje dzienny raport ofert w formatach JSONL/JSON-LD i CSV, a następnie wysyła go do API."
 
     def generate_csv_report(self, dane_dewelopera, oferty):
         """
         Generuje raport w formacie CSV i zapisuje go w pliku.
-        Każdy parametr w tabeli to nowa, oddzielna kolumna.
+        Każdy element listy trafia do osobnej kolumny.
         """
         raporty_dir = "raporty"
         if not os.path.exists(raporty_dir):
@@ -21,14 +22,25 @@ class Command(BaseCommand):
         data_raportu = str(date.today())
         nazwa_pliku = f"{raporty_dir}/Raport ofert firmy BZ-Bud_{data_raportu}.csv"
 
+        # Ustalenie maksymalnej liczby elementów w listach
+        max_pom = max((oferta.pomieszczenia_przynalezne.count() for oferta in oferty), default=0)
+        max_rab = max((oferta.rabaty.count() for oferta in oferty), default=0)
+        max_swi = max((oferta.inne_swiadczenia.count() for oferta in oferty), default=0)
+
+        # Pola podstawowe
+        fieldnames = [
+            "nip", "regon", "nazwa_firmy", "adres_biura",
+            "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
+            "metraz", "pokoje", "status", "cena_pln", "cena_za_m2_pln", "data_ceny",
+            "inwestycja_nazwa", "inwestycja_adres", "inwestycja_id",
+        ]
+
+        # Dodajemy kolumny dynamiczne
+        fieldnames += [f"pomieszczenie_{i+1}" for i in range(max_pom)]
+        fieldnames += [f"rabat_{i+1}" for i in range(max_rab)]
+        fieldnames += [f"swiadczenie_{i+1}" for i in range(max_swi)]
+
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
-            fieldnames = [
-                "nip", "regon", "nazwa_firmy", "adres_biura",
-                "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
-                "metraz", "pokoje", "status", "cena_pln", "cena_za_m2_pln", "data_ceny",
-                "inwestycja_nazwa", "inwestycja_adres", "inwestycja_id",
-                "pomieszczenia_przynalezne_nazwy", "rabaty_i_promocje_nazwy", "inne_swiadczenia_nazwy"
-            ]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';')
             writer.writeheader()
 
@@ -36,12 +48,7 @@ class Command(BaseCommand):
                 ceny_list = list(oferta.ceny.all())
                 ostatnia_cena = ceny_list[-1] if ceny_list else None
                 cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else ""
-                
-                pomieszczenia = ", ".join([p.nazwa for p in oferta.pomieszczenia_przynalezne.all()])
-                rabaty = ", ".join([r.nazwa for r in oferta.rabaty.all()])
-                swiadczenia = ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
 
-                # Zmieniony słownik, który spłaszcza dane do jednej, płaskiej struktury
                 rekord_csv = {
                     "nip": dane_dewelopera["nip"],
                     "regon": dane_dewelopera["regon"],
@@ -60,10 +67,18 @@ class Command(BaseCommand):
                     "inwestycja_nazwa": oferta.inwestycja.nazwa if oferta.inwestycja else "",
                     "inwestycja_adres": oferta.inwestycja.adres if oferta.inwestycja else "",
                     "inwestycja_id": oferta.inwestycja.id if oferta.inwestycja else "",
-                    "pomieszczenia_przynalezne_nazwy": pomieszczenia,
-                    "rabaty_i_promocje_nazwy": rabaty,
-                    "inne_swiadczenia_nazwy": swiadczenia,
                 }
+
+                # Rozwój list na osobne kolumny
+                for i, p in enumerate(oferta.pomieszczenia_przynalezne.all()):
+                    rekord_csv[f"pomieszczenie_{i+1}"] = p.nazwa
+
+                for i, r in enumerate(oferta.rabaty.all()):
+                    rekord_csv[f"rabat_{i+1}"] = r.nazwa
+
+                for i, s in enumerate(oferta.inne_swiadczenia.all()):
+                    rekord_csv[f"swiadczenie_{i+1}"] = s.nazwa
+
                 writer.writerow(rekord_csv)
 
         self.stdout.write(self.style.SUCCESS(f"Raport CSV został pomyślnie wygenerowany: {nazwa_pliku}"))
