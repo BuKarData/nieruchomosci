@@ -1,81 +1,73 @@
+import json
+import requests
+from datetime import datetime
 from django.core.management.base import BaseCommand
 from oferty.models import Oferta
-from datetime import datetime
-import requests
-import json
-import logging
-
-logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = "Generuje dzienny raport ofert zgodny z art. 19b ustawy i wysyła go do API ministerstwa"
+    help = "Generuje raport ofert w formacie JSON-LD zgodnym z art. 19b ustawy i wysyła przez API"
 
     def handle(self, *args, **kwargs):
         oferty = Oferta.objects.prefetch_related("ceny", "pomieszczenia", "swiadczenia").all()
 
         raport = {
-            "meta": {
-                "wersja": "1.0",
-                "data_raportu": datetime.now().isoformat(),
-                "źródło": "BuKarData",
-                "typ_danych": "oferty_mieszkaniowe"
+            "@context": {
+                "schema": "https://schema.org/",
+                "adres": "schema:address",
+                "lokalizacja": "schema:location",
+                "metraz": "schema:floorSize",
+                "pokoje": "schema:numberOfRooms",
+                "status": "schema:availability",
+                "cena": "schema:price",
+                "cena_m2": "schema:pricePerUnit",
+                "data_ceny": "schema:priceValidUntil",
+                "pomieszczenia_typ": "schema:hasPart",
+                "pomieszczenia_powierzchnia": "schema:area",
+                "pomieszczenia_cena": "schema:price",
+                "swiadczenie_nazwa": "schema:name",
+                "swiadczenie_kwota": "schema:value",
+                "swiadczenie_vat": "schema:taxRate",
+                "data_aktualizacji": "schema:dateModified"
             },
+            "@type": "schema:OfferCatalog",
+            "data_raportu": datetime.now().isoformat(),
+            "źródło": "https://www.bzbud.pl",
             "oferty": []
         }
 
         for oferta in oferty:
-            ceny = list(oferta.ceny.all())
-            ostatnia_cena = ceny[-1] if ceny else None
+            cena_obj = oferta.ceny.last()
+            pom = oferta.pomieszczenia.first()
+            sw = oferta.swiadczenia.first()
 
-            # Walidacja podstawowych danych
-            if not oferta.adres or not oferta.metraz or not ostatnia_cena:
-                logger.warning(f"Pominięto ofertę ID {oferta.id} z powodu brakujących danych")
-                continue
-
-            pomieszczenia = [
-                {
-                    "typ": p.typ,
-                    "powierzchnia": float(p.powierzchnia),
-                    "cena": float(p.cena)
-                } for p in oferta.pomieszczenia.all()
-            ]
-
-            inne_swiadczenia = [
-                {
-                    "nazwa": s.nazwa,
-                    "kwota": float(s.kwota),
-                    "vat": s.vat_stawka
-                } for s in oferta.swiadczenia.all()
-            ]
-
-            raport["oferty"].append({
-                "id_oferty": oferta.id,
+            oferta_jsonld = {
+                "@type": "schema:Offer",
+                "@id": f"https://www.bzbud.pl/oferta/{oferta.id}",
                 "adres": oferta.adres,
                 "lokalizacja": oferta.lokalizacja,
-                "metraz_użytkowy": float(oferta.metraz),
-                "liczba_pokoi": oferta.pokoje,
+                "metraz": float(oferta.metraz),
+                "pokoje": oferta.pokoje,
                 "status": oferta.status,
-                "cena_m2": float(oferta.cena_m2) if hasattr(oferta, "cena_m2") else None,
-                "cena_całkowita": float(ostatnia_cena.kwota),
-                "data_ceny": ostatnia_cena.data.isoformat(),
-                "pomieszczenia_przynależne": pomieszczenia,
-                "inne_swiadczenia": inne_swiadczenia,
-                "data_aktualizacji": datetime.now().isoformat()
-            })
+                "cena": float(cena_obj.kwota) if cena_obj else None,
+                "cena_m2": float(oferta.cena_m2) if oferta.cena_m2 else None,
+                "data_ceny": cena_obj.data.isoformat() if cena_obj else None,
+                "pomieszczenia_typ": pom.typ if pom else None,
+                "pomieszczenia_powierzchnia": float(pom.powierzchnia) if pom else None,
+                "pomieszczenia_cena": float(pom.cena) if pom else None,
+                "swiadczenie_nazwa": sw.nazwa if sw else None,
+                "swiadczenie_kwota": float(sw.kwota) if sw else None,
+                "swiadczenie_vat": sw.vat_stawka if sw else None,
+                "data_aktualizacji": oferta.data_aktualizacji.isoformat()
+            }
 
-        # Webhook testowy — możesz wygenerować swój na https://webhook.site
-        url_api = "https://webhook.site/63ac4048-0ef4-4847-8787-0fff7d401940"
-        headers = {
-            "Content-Type": "application/json"
-        }
+            raport["oferty"].append(oferta_jsonld)
 
-        try:
-            response = requests.post(url_api, headers=headers, data=json.dumps(raport))
-            if response.status_code == 200:
-                self.stdout.write(self.style.SUCCESS("✅ Raport wysłany pomyślnie"))
-            else:
-                self.stdout.write(self.style.WARNING(f"⚠️ Odpowiedź API: {response.status_code} - {response.text}"))
-                logger.warning(f"API response: {response.status_code} - {response.text}")
-        except Exception as e:
-            self.stdout.write(self.style.ERROR(f"❌ Błąd wysyłki raportu: {e}"))
-            logger.error(f"Błąd wysyłki raportu: {e}")
+        # Wysyłka JSON-LD przez API
+        url = "https://webhook.site/63ac4048-0ef4-4847-8787-0fff7d401940"
+        headers = {"Content-Type": "application/ld+json"}
+
+        response = requests.post(url, headers=headers, data=json.dumps(raport))
+        if response.status_code == 200:
+            self.stdout.write(self.style.SUCCESS("✅ JSON-LD wysłany pomyślnie"))
+        else:
+            self.stdout.write(self.style.WARNING(f"⚠️ Błąd: {response.status_code} - {response.text}"))
