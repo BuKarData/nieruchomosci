@@ -12,19 +12,18 @@ class Command(BaseCommand):
     def generate_csv_report(self, dane_dewelopera, oferty):
         """
         Generuje raport w formacie CSV i zapisuje go w pliku.
-        Każdy parametr w tabeli to oddzielna kolumna.
+        Każdy parametr w tabeli to nowa, oddzielna kolumna.
         """
         raporty_dir = "raporty"
         if not os.path.exists(raporty_dir):
             os.makedirs(raporty_dir)
 
         data_raportu = str(date.today())
-        # Zmiana nazwy pliku na stałą, zgodnie z Twoim życzeniem
         nazwa_pliku = f"{raporty_dir}/Raport ofert firmy BZ-Bud.csv"
 
         # Zmiana kodowania na 'utf-8-sig', co dodaje BOM i zapewnia poprawną obsługę polskich znaków w Excelu
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
-            # Zaktualizowana lista nagłówków kolumn, które są spójne z kluczami słownika `rekord_csv`
+            # Ujednolicona lista nagłówków kolumn
             fieldnames = [
                 "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
                 "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
@@ -45,7 +44,7 @@ class Command(BaseCommand):
                 rabaty = ", ".join([r.nazwa for r in oferta.rabaty.all()])
                 swiadczenia = ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
 
-                # Słownik z danymi, którego klucze odpowiadają `fieldnames`
+                # Słownik z danymi, którego klucze odpowiadają nagłówkom w `fieldnames`
                 rekord_csv = {
                     "nip": dane_dewelopera["nip"],
                     "regon": dane_dewelopera["regon"],
