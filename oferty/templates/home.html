@@ -250,6 +250,17 @@
            class="gallery-thumb"
            onclick="openImageModal('{{ zdj.obraz.url }}')">
     {% endfor %}
+
+      <!-- Po liście ofert w popupie -->
+      {% if inwestycja.standard %}
+      <div class="inwestycja-standard">
+      <h5>Standard wykończenia budynku</h5>
+      <p>{{ inwestycja.standard }}</p>
+      </div>
+     {% else %}
+     <span class="text-muted">Brak informacji</span>
+    {% endif %}
+    
   </div>
   <button class="gallery-arrow right" onclick="scrollGallery(this, 1)">&#10095;</button>
 </div>
@@ -282,16 +293,6 @@
     {% empty %}
       <p>Brak inwestycji</p>
     {% endfor %}
-
-    <!-- Po liście ofert w popupie -->
-    {% if inwestycja.standard %}
-      <div class="inwestycja-standard">
-      <h5>Standard wykończenia budynku</h5>
-      <p>{{ inwestycja.standard }}</p>
-      </div>
-     {% else %}
-     <span class="text-muted">Brak informacji</span>
-    {% endif %}
 
 <!-- Modal na rzut oferty -->
 <div id="rzutModal" class="image-modal">
