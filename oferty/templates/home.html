@@ -272,6 +272,14 @@
   <img id="rzutImage" src="" alt="Rzut oferty">
 </div>
 
+<!-- Po liście ofert w popupie -->
+{% if inwestycja.opis %}
+<div class="inwestycja-opis">
+  <h5>Standard wykończenia budynku</h5>
+  <p>{{ inwestycja.opis }}</p>
+</div>
+{% endif %}
+
 
 
     <!-- Modal na powiększone zdjęcie -->
