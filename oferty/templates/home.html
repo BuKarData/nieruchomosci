@@ -235,16 +235,6 @@
           <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
           <h3 class="mb-4 text-center fw-bold">Oferty dla inwestycji {{ inwestycja.nazwa }}</h3>
   
-<!-- Po liście ofert w popupie -->
-  {% if inwestycja.standard %}
-    <div class="inwestycja-standard">
-    <h5>Standard wykończenia budynku</h5>
-    <p>{{ inwestycja.standard }}</p>
-    </div>
-  {% else %}
-      <span class="text-muted">Brak informacji</span>
-  {% endif %}
-
 
           <!-- Galeria zdjęć inwestycji -->
 <div class="gallery-container position-relative mb-4">
@@ -295,6 +285,16 @@
     {% empty %}
       <p>Brak inwestycji</p>
     {% endfor %}
+
+    <!-- Po liście ofert w popupie -->
+  {% if inwestycja.standard %}
+  <div class="inwestycja-standard">
+  <h5>Standard wykończenia budynku</h5>
+  <p>{{ inwestycja.standard }}</p>
+  </div>
+{% else %}
+    <span class="text-muted">Brak informacji</span>
+{% endif %}
 
 <!-- Modal na rzut oferty -->
 <div id="rzutModal" class="image-modal">
