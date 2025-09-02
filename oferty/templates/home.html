@@ -212,6 +212,14 @@
       <p>Brak inwestycji</p>
     {% endfor %}
 
+<!-- Modal na rzut oferty -->
+<div id="rzutModal" class="image-modal">
+  <span class="close-modal" onclick="closeRzutModal()">&times;</span>
+  <img id="rzutImage" src="" alt="Rzut oferty">
+</div>
+
+
+
     <!-- Modal na powiększone zdjęcie -->
 <div id="imageModal" class="image-modal">
   <span class="close-modal" onclick="closeImageModal()">&times;</span>
@@ -261,6 +269,19 @@
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 300);
     }
+    function openRzutModal(src){
+  const modal = document.getElementById('rzutModal');
+  const img = document.getElementById('rzutImage');
+  img.src = src;
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('show'), 10);
+}
+function closeRzutModal(){
+  const modal = document.getElementById('rzutModal');
+  modal.classList.remove('show');
+  setTimeout(() => modal.style.display = 'none', 300);
+}
+
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
