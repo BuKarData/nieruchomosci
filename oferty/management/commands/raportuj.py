@@ -1,5 +1,3 @@
-# /twoj_projekt/nazwa_aplikacji/management/commands/raportuj.py
-
 from django.core.management.base import BaseCommand
 from oferty.models import Oferta
 import requests
@@ -14,6 +12,7 @@ class Command(BaseCommand):
     def generate_csv_report(self, dane_dewelopera, oferty):
         """
         Generuje raport w formacie CSV i zapisuje go w pliku.
+        Każdy parametr w tabeli to oddzielna kolumna.
         """
         raporty_dir = "raporty"
         if not os.path.exists(raporty_dir):
@@ -24,11 +23,13 @@ class Command(BaseCommand):
 
         # Zmiana kodowania na 'utf-8-sig', co dodaje BOM i zapewnia poprawną obsługę polskich znaków w Excelu
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
+            # Zaktualizowana lista nagłówków kolumn
             fieldnames = [
                 "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
-                "id_oferty", "adres_inwestycji", "numer_lokalu", "numer_oferty",
-                "metraz", "pokoje", "status", "cena", "cena_za_m2", "data_ceny",
-                "pomieszczenia_przynaleznie", "rabaty_i_promocje", "inne_swiadczenia"
+                "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
+                "metraz", "pokoje", "status", "cena_pln", "cena_za_m2_pln", "data_ceny",
+                "inwestycja_nazwa", "inwestycja_adres", "inwestycja_id",
+                "pomieszczenia_przynalezne_nazwy", "rabaty_i_promocje_nazwy", "inne_swiadczenia_nazwy"
             ]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';')
             writer.writeheader()
@@ -38,6 +39,12 @@ class Command(BaseCommand):
                 ostatnia_cena = ceny_list[-1] if ceny_list else None
                 cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else ""
                 
+                # Zbieranie nazw z powiązanych modeli i łączenie ich w jeden ciąg
+                pomieszczenia = ", ".join([p.nazwa for p in oferta.pomieszczenia_przynalezne.all()])
+                rabaty = ", ".join([r.nazwa for r in oferta.rabaty.all()])
+                swiadczenia = ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
+
+                # Zaktualizowany słownik z danymi
                 rekord_csv = {
                     "nip": dane_dewelopera["nip"],
                     "regon": dane_dewelopera["regon"],
@@ -45,18 +52,21 @@ class Command(BaseCommand):
                     "adres_biura": dane_dewelopera["adres_biura"],
                     "data_raportu": data_raportu,
                     "id_oferty": oferta.id,
-                    "adres_inwestycji": oferta.inwestycja.adres if oferta.inwestycja else "",
                     "numer_lokalu": oferta.numer_lokalu,
                     "numer_oferty": oferta.numer_oferty if hasattr(oferta, 'numer_oferty') else "",
+                    "rodzaj_lokalu": oferta.rodzaj_lokalu.nazwa if oferta.rodzaj_lokalu else "",
                     "metraz": float(oferta.metraz) if oferta.metraz else "",
                     "pokoje": oferta.pokoje,
                     "status": oferta.status,
-                    "cena": float(ostatnia_cena.kwota) if ostatnia_cena else "",
-                    "cena_za_m2": cena_m2,
+                    "cena_pln": float(ostatnia_cena.kwota) if ostatnia_cena else "",
+                    "cena_za_m2_pln": cena_m2,
                     "data_ceny": ostatnia_cena.data.isoformat() if ostatnia_cena else "",
-                    "pomieszczenia_przynaleznie": ", ".join([p.nazwa for p in oferta.pomieszczenia_przynalezne.all()]),
-                    "rabaty_i_promocje": ", ".join([r.nazwa for r in oferta.rabaty.all()]),
-                    "inne_swiadczenia": ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
+                    "inwestycja_nazwa": oferta.inwestycja.nazwa if oferta.inwestycja else "",
+                    "inwestycja_adres": oferta.inwestycja.adres if oferta.inwestycja else "",
+                    "inwestycja_id": oferta.inwestycja.id if oferta.inwestycja else "",
+                    "pomieszczenia_przynaleznie_nazwy": pomieszczenia,
+                    "rabaty_i_promocje_nazwy": rabaty,
+                    "inne_swiadczenia_nazwy": swiadczenia,
                 }
                 writer.writerow(rekord_csv)
 
