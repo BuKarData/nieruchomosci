@@ -235,6 +235,17 @@
           <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
           <h3 class="mb-4 text-center fw-bold">Oferty dla inwestycji {{ inwestycja.nazwa }}</h3>
   
+<!-- Po liście ofert w popupie -->
+  {% if inwestycja.standard %}
+    <div class="inwestycja-standard">
+    <h5>Standard wykończenia budynku</h5>
+    <p>{{ inwestycja.standard }}</p>
+    </div>
+  {% else %}
+      <span class="text-muted">Brak informacji</span>
+  {% endif %}
+
+
           <!-- Galeria zdjęć inwestycji -->
 <div class="gallery-container position-relative mb-4">
   <button class="gallery-arrow left" onclick="scrollGallery(this, -1)">&#10094;</button>
@@ -251,16 +262,7 @@
            onclick="openImageModal('{{ zdj.obraz.url }}')">
     {% endfor %}
 
-      <!-- Po liście ofert w popupie -->
-      {% if inwestycja.standard %}
-      <div class="inwestycja-standard">
-      <h5>Standard wykończenia budynku</h5>
-      <p>{{ inwestycja.standard }}</p>
-      </div>
-     {% else %}
-     <span class="text-muted">Brak informacji</span>
-    {% endif %}
-    
+      
   </div>
   <button class="gallery-arrow right" onclick="scrollGallery(this, 1)">&#10095;</button>
 </div>
