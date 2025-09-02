@@ -19,13 +19,11 @@ class Command(BaseCommand):
             os.makedirs(raporty_dir)
 
         data_raportu = str(date.today())
-        # Zmieniona nazwa pliku z dodaną dynamiczną datą
         nazwa_pliku = f"{raporty_dir}/Raport ofert firmy BZ-Bud_{data_raportu}.csv"
 
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
-            # Ujednolicona lista nagłówków kolumn
             fieldnames = [
-                "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
+                "nip", "regon", "nazwa_firmy", "adres_biura",
                 "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
                 "metraz", "pokoje", "status", "cena_pln", "cena_za_m2_pln", "data_ceny",
                 "inwestycja_nazwa", "inwestycja_adres", "inwestycja_id",
@@ -39,18 +37,16 @@ class Command(BaseCommand):
                 ostatnia_cena = ceny_list[-1] if ceny_list else None
                 cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else ""
                 
-                # Zbieranie nazw z powiązanych modeli i łączenie ich w jeden ciąg
                 pomieszczenia = ", ".join([p.nazwa for p in oferta.pomieszczenia_przynalezne.all()])
                 rabaty = ", ".join([r.nazwa for r in oferta.rabaty.all()])
                 swiadczenia = ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
 
-                # Słownik z danymi, którego klucze odpowiadają nagłówkom w `fieldnames`
+                # Zmieniony słownik, który spłaszcza dane do jednej, płaskiej struktury
                 rekord_csv = {
                     "nip": dane_dewelopera["nip"],
                     "regon": dane_dewelopera["regon"],
                     "nazwa_firmy": dane_dewelopera["nazwa_firmy"],
                     "adres_biura": dane_dewelopera["adres_biura"],
-                    "data_raportu": data_raportu,
                     "id_oferty": oferta.id,
                     "numer_lokalu": oferta.numer_lokalu,
                     "numer_oferty": oferta.numer_oferty if hasattr(oferta, 'numer_oferty') else "",
@@ -73,9 +69,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Raport CSV został pomyślnie wygenerowany: {nazwa_pliku}"))
 
     def generate_jsonld_report(self, dane_dewelopera, oferty):
-        """
-        Generuje raport w formacie JSON-LD.
-        """
+        # ... (Ta funkcja pozostaje bez zmian)
         raporty_dir = "raporty"
         if not os.path.exists(raporty_dir):
             os.makedirs(raporty_dir)
@@ -99,7 +93,6 @@ class Command(BaseCommand):
             ostatnia_cena = ceny_list[-1] if ceny_list else None
             cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else None
             
-            # Pobieranie powiązanych danych
             pomieszczenia_przynalezne = [{"nazwa": p.nazwa, "cena": float(p.cena)} for p in oferta.pomieszczenia_przynalezne.all()]
             rabaty = [{"nazwa": r.nazwa, "wartosc": float(r.wartosc), "typ": r.typ} for r in oferta.rabaty.all()]
             inne_swiadczenia = [{"nazwa": s.nazwa, "kwota": float(s.kwota)} for s in oferta.inne_swiadczenia.all()]
@@ -146,12 +139,10 @@ class Command(BaseCommand):
                 "rabaty": rabaty,
                 "inne_swiadczenia": inne_swiadczenia,
             }
-            # `ensure_ascii=False` jest kluczowe dla poprawnego kodowania znaków unicode w JSON
             raport_lines.append(json.dumps(rekord_jsonld, ensure_ascii=False))
 
         payload_jsonld = "\n".join(raport_lines)
 
-        # Zmiana kodowania w trybie zapisu, aby upewnić się, że JSON-LD jest poprawny
         with open(nazwa_pliku, "w", encoding="utf-8") as f:
             f.write(payload_jsonld)
             
@@ -181,7 +172,6 @@ class Command(BaseCommand):
         data_raportu = str(date.today())
 
         for oferta in oferty:
-            # Walidacja danych przed dodaniem do raportu
             if not oferta.inwestycja or not oferta.inwestycja.unikalny_identyfikator_przedsiewziecia:
                 self.stdout.write(self.style.ERROR(f"Błąd walidacji: Oferta o ID {oferta.id} nie ma powiązanej inwestycji lub unikalnego identyfikatora."))
                 continue
@@ -195,7 +185,6 @@ class Command(BaseCommand):
 
             cena_m2 = (float(ostatnia_cena.kwota) / float(oferta.metraz)) if ostatnia_cena and oferta.metraz else None
 
-            # Spłaszczanie danych do pojedynczego rekordu JSON
             rekord_oferty = {
                 "deweloper": {
                     "nip": dane_dewelopera["nip"],
@@ -226,7 +215,6 @@ class Command(BaseCommand):
                     "inne_swiadczenia": [{"nazwa": s.nazwa, "kwota": float(s.kwota)} for s in oferta.inne_swiadczenia.all()]
                 }
             }
-            # `ensure_ascii=False` jest kluczowe dla poprawności znaków unicode w JSON
             raport_lines.append(json.dumps(rekord_oferty, ensure_ascii=False))
 
         if not raport_lines:
@@ -234,7 +222,6 @@ class Command(BaseCommand):
             return
 
         payload = "\n".join(raport_lines)
-        # Jawne ustawienie kodowania w nagłówku HTTP
         headers = {"Content-Type": "application/x-json-stream; charset=utf-8"}
         url_api = "https://webhook.site/63ac4048-0ef4-4847-8787-0fff7d401940"
 
