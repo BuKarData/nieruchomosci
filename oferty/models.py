@@ -64,7 +64,7 @@ class InwestycjaZdjecie(models.Model):
         return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
     
     class RodzajLokalu(models.Model):
-    nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
+        nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
 
     def __str__(self):
         return self.nazwa
