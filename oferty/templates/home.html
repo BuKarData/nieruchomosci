@@ -210,10 +210,11 @@
     {% endfor %}
 
     <!-- Modal na powiększone zdjęcie -->
-    <div id="imageModal" class="image-modal d-flex">
-      <span class="close-modal" onclick="closeImageModal()">&times;</span>
-      <img id="modalImage" src="" alt="Zdjęcie powiększone">
-    </div>
+<div id="imageModal" class="image-modal">
+  <span class="close-modal" onclick="closeImageModal()">&times;</span>
+  <img id="modalImage" src="" alt="Zdjęcie powiększone">
+</div>
+
 
     <div class="text-center mt-4">
       <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
