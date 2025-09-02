@@ -22,7 +22,8 @@ class Command(BaseCommand):
         data_raportu = str(date.today())
         nazwa_pliku = f"{raporty_dir}/raport_{data_raportu}.csv"
 
-        with open(nazwa_pliku, "w", newline="", encoding="utf-8") as csvfile:
+        # Zmiana kodowania na 'utf-8-sig', co dodaje BOM i zapewnia poprawną obsługę polskich znaków w Excelu
+        with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
             fieldnames = [
                 "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
                 "id_oferty", "adres_inwestycji", "numer_lokalu", "numer_oferty",
@@ -60,8 +61,6 @@ class Command(BaseCommand):
                 writer.writerow(rekord_csv)
 
         self.stdout.write(self.style.SUCCESS(f"Raport CSV został pomyślnie wygenerowany: {nazwa_pliku}"))
-
-
 
     def generate_jsonld_report(self, dane_dewelopera, oferty):
         """
@@ -137,15 +136,16 @@ class Command(BaseCommand):
                 "rabaty": rabaty,
                 "inne_swiadczenia": inne_swiadczenia,
             }
+            # `ensure_ascii=False` jest kluczowe dla poprawnego kodowania znaków unicode w JSON
             raport_lines.append(json.dumps(rekord_jsonld, ensure_ascii=False))
 
         payload_jsonld = "\n".join(raport_lines)
 
+        # Zmiana kodowania w trybie zapisu, aby upewnić się, że JSON-LD jest poprawny
         with open(nazwa_pliku, "w", encoding="utf-8") as f:
             f.write(payload_jsonld)
             
         self.stdout.write(self.style.SUCCESS(f"Raport JSON-LD został pomyślnie wygenerowany: {nazwa_pliku}"))
-
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Rozpoczynanie generowania raportów...")
@@ -153,7 +153,7 @@ class Command(BaseCommand):
         dane_dewelopera = {
             "nip": "8261116680",         
             "regon": "540649478",        
-            "nazwa_firmy": "B.Z­BUD Beata Żochowska",
+            "nazwa_firmy": "B.Z-BUD Beata Żochowska",
             "adres_biura": "woj. MAZOWIECKIE, pow. wołomiński, gm. Zielonka, miejsc. Zielonka, ul. Ignacego Paderewskiego, nr 61, 05-220"
         }
 
@@ -216,14 +216,16 @@ class Command(BaseCommand):
                     "inne_swiadczenia": [{"nazwa": s.nazwa, "kwota": float(s.kwota)} for s in oferta.inne_swiadczenia.all()]
                 }
             }
-            raport_lines.append(json.dumps(rekord_oferty))
+            # `ensure_ascii=False` jest kluczowe dla poprawności znaków unicode w JSON
+            raport_lines.append(json.dumps(rekord_oferty, ensure_ascii=False))
 
         if not raport_lines:
             self.stdout.write(self.style.WARNING("Brak poprawnych ofert do wysłania."))
             return
 
         payload = "\n".join(raport_lines)
-        headers = {"Content-Type": "application/x-json-stream"}
+        # Jawne ustawienie kodowania w nagłówku HTTP
+        headers = {"Content-Type": "application/x-json-stream; charset=utf-8"}
         url_api = "https://webhook.site/63ac4048-0ef4-4847-8787-0fff7d401940"
 
         try:
