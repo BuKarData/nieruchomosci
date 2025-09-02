@@ -68,14 +68,13 @@ class InwestycjaZdjecie(models.Model):
             return f"Zdjęcie {self.id} - {self.inwestycja.nazwa}"
         return f"Zdjęcie {self.id} (no related investment)"
     
-    class RodzajLokalu(models.Model):
+class RodzajLokalu(models.Model):
         nazwa = models.CharField(max_length=100, unique=True, verbose_name="Rodzaj Lokalu")
+        def __str__(self):
+            return self.nazwa
 
-    def __str__(self):
-        return self.nazwa
-
-    class Meta:
-        verbose_name_plural = "Rodzaje Lokali"
+        class Meta:
+            verbose_name_plural = "Rodzaje Lokali"
 
 class PomieszczeniePrzynalezne(models.Model):
     oferta = models.ForeignKey('Oferta', on_delete=models.CASCADE, related_name='pomieszczenia_przynalezne')
