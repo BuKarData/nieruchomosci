@@ -276,21 +276,23 @@
                    <button class="btn btn-outline-primary btn-sm" onclick="openRzutModal('{{ oferta.zdjecie.url }}')">Zobacz rzut</button>
                     </div>
                  {% endif %}
+                                <!-- Po liście ofert w popupie -->
+                 {% if inwestycja.standard %}
+                   <div class="inwestycja-standard">
+                   <h5>Standard wykończenia budynku</h5>
+                   <p>{{ inwestycja.standard }}</p>
+                   </div>
+                 {% else %}
+                    <span class="text-muted">Brak informacji</span>
+                 {% endif %}
+
             {% empty %}
               <li class="text-center text-muted py-3">Brak ofert dla tej inwestycji</li>
             {% endfor %}
           </ul>
         </div>
       </div>
-              <!-- Po liście ofert w popupie -->
-        {% if inwestycja.standard %}
-          <div class="inwestycja-standard">
-          <h5>Standard wykończenia budynku</h5>
-          <p>{{ inwestycja.standard }}</p>
-          </div>
-        {% else %}
-          <span class="text-muted">Brak informacji</span>
-        {% endif %}
+    
     {% empty %}
       <p>Brak inwestycji</p>
     {% endfor %}
