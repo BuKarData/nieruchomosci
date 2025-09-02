@@ -1,12 +1,17 @@
 from django.contrib import admin
-from .models import Oferta, Cena, Inwestycja
+from .models import Oferta, Cena, Inwestycja, InwestycjaZdjecie
 
-#admin.site.register(Oferta)
-#admin.site.register(Cena)
+
+
+
+class InwestycjaZdjecieInline(admin.TabularInline):
+    model = InwestycjaZdjecie
+    extra = 1
 
 
 @admin.register(Inwestycja)
 class InwestycjaAdmin(admin.ModelAdmin):
+    inlines = [InwestycjaZdjecieInline]
     list_display = ("nazwa", "adres", "data_dodania")
     search_fields = ("nazwa", "adres")
 

@@ -171,18 +171,17 @@
           <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
           <h3 class="mb-4 text-center fw-bold">Oferty dla inwestycji {{ inwestycja.nazwa }}</h3>
 
-          <!-- Zdjęcie inwestycji w popupie -->
-          <div class="text-center mb-4">
-            {% if inwestycja.zdjecie %}
-              <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}"
-                   class="popup-img"
-                   onclick="openImageModal('{{ inwestycja.zdjecie.url }}')">
-            {% else %}
-              <img src="{% static 'no-image.jpg' %}" alt="Brak zdjęcia"
-                   class="popup-img"
-                   onclick="openImageModal('{% static 'no-image.jpg' %}')">
-            {% endif %}
-          </div>
+         <!-- Galeria zdjęć inwestycji -->
+<div class="popup-gallery d-flex flex-wrap justify-content-center gap-3 mb-4">
+  {% if inwestycja.zdjecie %}
+    <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="popup-thumb" onclick="openImageModal('{{ inwestycja.zdjecie.url }}')">
+  {% endif %}
+
+  {% for zdj in inwestycja.zdjecia.all %}
+    <img src="{{ zdj.obraz.url }}" alt="Zdjęcie inwestycji" class="popup-thumb" onclick="openImageModal('{{ zdj.obraz.url }}')">
+  {% endfor %}
+</div>
+
 
           <ul class="list-unstyled">
             {% for oferta in inwestycja.oferty.all %}
