@@ -32,9 +32,9 @@ class Oferta(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="dostępne")
     data_dodania = models.DateTimeField(auto_now_add=True)
     zdjecie = models.ImageField(upload_to="inwestycje/", blank=True, null=True)
-
+    numer_lokalu = models.CharField(max_length=50, blank=True, null=True, help_text="Numer lub nazwa lokalu, np. A1/M5")
     def __str__(self):
-        return f"{self.adres} ({self.metraz} m², {self.pokoje} pok.)"
+        return f"{self.adres}, {self.id}, ({self.metraz} m², {self.pokoje} pok.)"
 
 
 class Cena(models.Model):
