@@ -122,6 +122,53 @@
       transition: transform 0.3s;
     }
     .popup-img:hover { transform: scale(1.02); }
+
+    .gallery-container {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.gallery-wrapper {
+  scroll-behavior: smooth;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.gallery-thumb {
+  flex: 0 0 auto;
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.gallery-thumb:hover {
+  transform: scale(1.05);
+}
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.8);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.3s;
+}
+.gallery-arrow:hover {
+  background: rgba(255,255,255,1);
+}
+.gallery-arrow.left { left: -20px; }
+.gallery-arrow.right { right: -20px; }
+
   </style>
 </head>
 
@@ -170,16 +217,24 @@
         <div class="popup-content shadow-lg rounded">
           <span class="close" onclick="hidePopup('popup-{{ inwestycja.id }}')">&times;</span>
           <h3 class="mb-4 text-center fw-bold">Oferty dla inwestycji {{ inwestycja.nazwa }}</h3>
+  
+          <!-- Galeria zdjęć inwestycji -->
+<div class="gallery-container position-relative mb-4">
+  <button class="gallery-arrow left" onclick="scrollGallery(this, -1)">&#10094;</button>
+  <div class="gallery-wrapper d-flex overflow-hidden">
+    {% if inwestycja.zdjecie %}
+      <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}"
+           class="gallery-thumb"
+           onclick="openImageModal('{{ inwestycja.zdjecie.url }}')">
+    {% endif %}
 
-         <!-- Galeria zdjęć inwestycji -->
-<div class="popup-gallery d-flex flex-wrap justify-content-center gap-3 mb-4">
-  {% if inwestycja.zdjecie %}
-    <img src="{{ inwestycja.zdjecie.url }}" alt="{{ inwestycja.nazwa }}" class="popup-thumb" onclick="openImageModal('{{ inwestycja.zdjecie.url }}')">
-  {% endif %}
-
-  {% for zdj in inwestycja.zdjecia.all %}
-    <img src="{{ zdj.obraz.url }}" alt="Zdjęcie inwestycji" class="popup-thumb" onclick="openImageModal('{{ zdj.obraz.url }}')">
-  {% endfor %}
+    {% for zdj in inwestycja.zdjecia.all %}
+      <img src="{{ zdj.obraz.url }}" alt="Zdjęcie inwestycji"
+           class="gallery-thumb"
+           onclick="openImageModal('{{ zdj.obraz.url }}')">
+    {% endfor %}
+  </div>
+  <button class="gallery-arrow right" onclick="scrollGallery(this, 1)">&#10095;</button>
 </div>
 
 
