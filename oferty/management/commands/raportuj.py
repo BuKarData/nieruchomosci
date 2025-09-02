@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         # Zmiana kodowania na 'utf-8-sig', co dodaje BOM i zapewnia poprawną obsługę polskich znaków w Excelu
         with open(nazwa_pliku, "w", newline="", encoding="utf-8-sig") as csvfile:
-            # Zaktualizowana lista nagłówków kolumn
+            # Zaktualizowana lista nagłówków kolumn, które są spójne z kluczami słownika `rekord_csv`
             fieldnames = [
                 "nip", "regon", "nazwa_firmy", "adres_biura", "data_raportu",
                 "id_oferty", "numer_lokalu", "numer_oferty", "rodzaj_lokalu",
@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 rabaty = ", ".join([r.nazwa for r in oferta.rabaty.all()])
                 swiadczenia = ", ".join([s.nazwa for s in oferta.inne_swiadczenia.all()])
 
-                # Zaktualizowany słownik z danymi
+                # Słownik z danymi, którego klucze odpowiadają `fieldnames`
                 rekord_csv = {
                     "nip": dane_dewelopera["nip"],
                     "regon": dane_dewelopera["regon"],
@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     "inwestycja_nazwa": oferta.inwestycja.nazwa if oferta.inwestycja else "",
                     "inwestycja_adres": oferta.inwestycja.adres if oferta.inwestycja else "",
                     "inwestycja_id": oferta.inwestycja.id if oferta.inwestycja else "",
-                    "pomieszczenia_przynaleznie_nazwy": pomieszczenia,
+                    "pomieszczenia_przynalezne_nazwy": pomieszczenia,
                     "rabaty_i_promocje_nazwy": rabaty,
                     "inne_swiadczenia_nazwy": swiadczenia,
                 }
