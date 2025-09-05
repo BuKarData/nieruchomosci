@@ -19,14 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from oferty import views
 from django.conf.urls.static import static
-from oferty.api import RaportAPIView
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('oferty.urls')), 
-     path('api/data.jsonld', RaportAPIView.as_view(), {'format': 'jsonld'}, name='data-jsonld'),
-    path('api/data.csv', RaportAPIView.as_view(), {'format': 'csv'}, name='data-csv'),
-    path('api/data.xlsx', RaportAPIView.as_view(), {'format': 'xlsx'}, name='data-xlsx'),
+    path('', include('oferty.urls')),  
+
 ]
 
 
@@ -41,4 +40,3 @@ from django.shortcuts import redirect
 def clean_url(request):
     if request.GET:
         return redirect(request.path)
-    # reszta Twojego widoku

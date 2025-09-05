@@ -21,6 +21,12 @@ CSRF_TRUSTED_ORIGINS = [
     "https://web-production-48d26.up.railway.app",  # opcjonalnie dla testów
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
 # Aplikacje
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -32,7 +38,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "oferty",
     "rest_framework",
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema'
+}
+
 
 # Middleware
 MIDDLEWARE = [
