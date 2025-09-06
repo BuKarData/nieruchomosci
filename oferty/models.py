@@ -22,6 +22,7 @@ class Oferta(models.Model):
         ("dostępne", "Dostępne"),
         ("sprzedane", "Sprzedane"),
         ("rezerwacja", "Rezerwacja"),
+        ('w_budowie', 'W budowie'),
     ]
 
     inwestycja = models.ForeignKey(
