@@ -130,6 +130,26 @@
   max-width: 640px;
   margin: 0 auto;
 }
+.btn-gold {
+  background-color: #d4af37;   /* złoty kolor */
+  border-color: #d4af37;
+  color: #fff;
+  font-weight: 600;
+}
+.btn-gold:hover {
+  background-color: #bfa231;   /* ciemniejsze złoto przy hover */
+  border-color: #bfa231;
+  color: #fff;
+}
+.btn-outline-gold {
+  border-color: #d4af37;
+  color: #d4af37;
+  font-weight: 600;
+}
+.btn-outline-gold:hover {
+  background-color: #d4af37;
+  color: #fff;
+}
 
 
 
@@ -174,7 +194,7 @@
 
 .inwestycja-standard {
   background: #f8f8f8;
-  border-left: 4px solid #0056b3;
+  border-left: 4px solid #d1ce219c;
   padding: 16px;
   border-radius: 8px;
   margin-top: 20px; 
@@ -224,7 +244,9 @@
           {% if inwestycja.opis %}
             <p class="mb-3">{{ inwestycja.opis }}</p>
           {% endif %}
-          <button class="btn btn-primary btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+          <button class="btn btn-gold btn-sm" onclick="showPopup('popup-{{ inwestycja.id }}')">Szczegóły inwestycji</button>
+
+
         </div>
 
         <div class="inwestycja-img">
@@ -280,7 +302,7 @@
 
                  {% if oferta.zdjecie %}
                     <div class="mt-2">
-                   <button class="btn btn-outline-primary btn-sm" onclick="openRzutModal('{{ oferta.zdjecie.url }}')">Zobacz rzut</button>
+                      <button class="btn btn-outline-gold btn-sm" onclick="openRzutModal('{{ oferta.zdjecie.url }}')">Zobacz rzut</button>
                     </div>
                  {% endif %}
                                 <!-- Po liście ofert w popupie -->
@@ -324,7 +346,7 @@
 
 
     <div class="text-center mt-4">
-      <a href="{% url 'lista_ofert' %}" class="btn btn-primary btn-lg btn-hover-fill">Zobacz inne oferty</a>
+      <a href="{% url 'lista_ofert' %}" class="btn btn-gold btn-lg">Zobacz inne oferty</a>
     </div>
 
     <!-- Sekcja "O nas" -->
